@@ -1,0 +1,37 @@
+﻿using Applications.Usecase.Common.Interfaces;
+using ErrorOr;
+using MediatR;
+using domain = Applications.Domain.Application;
+
+namespace Applications.Usecase.ApplicationServices.Commands;
+
+public class AddApplicationServiceHandler(
+    IGenericRepository<domain.Application, int> repository,
+    IUserContextProvider userContext,
+    IResourceLocalizer localizer,
+    IDateTimeProvider dateTimeProvider
+    )
+    : IRequestHandler<AddApplicationServiceCommand, ErrorOr<int>>
+{
+    public async Task<ErrorOr<int>> Handle(AddApplicationServiceCommand request, CancellationToken cancellationToken)
+    {
+        var option = FindOptions<domain.Application>.SetOptions();
+        option.Includes = [a => a.Services.Where(x => x.Deleted == false)];
+        var application = await repository.GetAsync(request.application, option, cancellationToken);
+        if (application is null)
+            return Error.NotFound(description: localizer.Localize(Resources.ResourceKey.Application.NotFound));
+
+        var addServiceResult = application.AddService(request.service,
+            request.active,
+            userContext.UserID,
+            dateTimeProvider.NowTimeStampInSecound());
+        if (addServiceResult.IsError)
+            return addServiceResult.Errors;
+
+        var result = await repository.UpdateAsync(application);
+        if (result > 0)
+            return result;
+
+        return Error.Failure(description: localizer.Localize(Resources.ResourceKey.ApplicationService.SetFailed));
+    }
+}
