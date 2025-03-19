@@ -1,6 +1,51 @@
-@Applications.API_HostAddress = http://localhost:5166
+﻿@baseUrl = https://localhost:44341
+@userId = 1
+@appUrl = /api/application/v1/application
 
-GET {{Applications.API_HostAddress}}/weatherforecast/
-Accept: application/json
+#Application Get
+Get {{baseUrl}}{{appUrl}}/1
+UserID:{{userId}}
 
 ###
+#Application Report
+POST {{baseUrl}}{{appUrl}}
+Content-Type: application/json
+UserID:{{userId}}
+
+{
+  "page": 1,
+  "size": 10,
+  "filter": [
+    {
+      "key": "id",
+      "value": "0",
+      "operation": "Greater"
+    }
+  ],
+  "orderBy": "id asc"
+}
+
+###
+#Application Add or Update
+Put {{baseUrl}}{{appUrl}}
+Content-Type: application/json
+UserID:{{userId}}
+
+{
+  "active": true,
+  "deleted": false,
+  "created_By": 0,
+  "created_At": 0,
+  "updated_By": 0,
+  "updated_At": 0,
+  "id": 25,
+  "key": "string45434534",
+  "title": "s43543535345",
+  "comment": "string",
+  "logoAddress": "string"
+}
+
+###
+#Application Delete
+Delete {{baseUrl}}{{appUrl}}/25
+UserID:{{userId}}

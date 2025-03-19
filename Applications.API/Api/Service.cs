@@ -7,7 +7,7 @@ using Asp.Versioning.Builder;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Applications.API;
+namespace Applications.API.Api;
 
 public static class Service
 {
@@ -29,13 +29,13 @@ public static class Service
         [FromRoute] int id, CancellationToken token, IMediator mediator)
     {
         var result = await mediator.Send(new GetServiceQuery(id), token);
-        return ResponseHelper.ToDto<Domain.Service.Service, ServiceParamDTO>(result, ToDto);
+        return ResponseHelper.ToDto(result, ToDto);
     }
     public static async Task<ResponseDTO<PaginatedListDTO<ServiceParamDTO>>> ServiceReport(
         [FromBody] ReportFilterDTO filter, CancellationToken token, IMediator mediator)
     {
         var result = await mediator.Send(new ReportServiceQuery(filter), token);
-        return ResponseHelper.ToDto<PaginatedListDTO<Domain.Service.Service>, PaginatedListDTO<ServiceParamDTO>>(result, ToDto);
+        return ResponseHelper.ToDto(result, ToDto);
     }
     public static async Task<ResponseDTO<int>> ServiceSet(
         [FromBody] ServiceParamDTO service, CancellationToken token, IMediator mediator)
@@ -44,20 +44,20 @@ public static class Service
         {
             var result = await mediator.Send(new UpdateServiceCommand(
                 service.ID, service.Key, service.Name, service.Active), token);
-            return ResponseHelper.ToResult<int, int>(result, () => { return result.Value; });
+            return ResponseHelper.ToResult(result, () => { return result.Value; });
         }
         else
         {
             var result = await mediator.Send(new AddServiceCommand(
               service.Key, service.Name, service.Active), token);
-            return ResponseHelper.ToResult<int, int>(result, () => { return result.Value; });
+            return ResponseHelper.ToResult(result, () => { return result.Value; });
         }
     }
     public static async Task<ResponseDTO<int>> ServiceDelete(
         [FromRoute] int id, CancellationToken token, IMediator mediator)
     {
         var result = await mediator.Send(new DeleteServiceCommand(id), token);
-        return ResponseHelper.ToResult<int, int>(result, () => { return result.Value; });
+        return ResponseHelper.ToResult(result, () => { return result.Value; });
     }
     private static ServiceParamDTO ToDto(Domain.Service.Service service) =>
         new(service.ID, service.Key.Value, service.Name.Value)

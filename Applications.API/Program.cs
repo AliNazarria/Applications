@@ -1,4 +1,4 @@
-using Applications.API;
+using Applications.API.Api;
 using Applications.API.Common;
 using Applications.API.Util;
 using Applications.Infrastructure;

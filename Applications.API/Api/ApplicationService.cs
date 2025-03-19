@@ -7,7 +7,7 @@ using Asp.Versioning.Builder;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Applications.API;
+namespace Applications.API.Api;
 
 public static class ApplicationService
 {
@@ -28,7 +28,7 @@ public static class ApplicationService
         [FromBody] ReportFilterDTO filter, CancellationToken token, IMediator mediator)
     {
         var result = await mediator.Send(new ReportApplicationServiceQuery(filter), token);
-        return ResponseHelper.ToDto<PaginatedListDTO<Domain.Application.ApplicationService>, PaginatedListDTO<ApplicationServiceParamDTO>>(result, ToDto);
+        return ResponseHelper.ToDto(result, ToDto);
     }
     public static async Task<ResponseDTO<int>> ApplicationServiceSet(
         [FromBody] ApplicationServiceParamDTO app, CancellationToken token, IMediator mediator)
@@ -37,20 +37,20 @@ public static class ApplicationService
         {
             var result = await mediator.Send(new UpdateApplicationServiceCommand(
                 app.ID, app.ApplicationID, app.ServiceID, app.Active), token);
-            return ResponseHelper.ToResult<int, int>(result, () => { return result.Value; });
+            return ResponseHelper.ToResult(result, () => { return result.Value; });
         }
         else
         {
             var result = await mediator.Send(new AddApplicationServiceCommand(
               app.ApplicationID, app.ServiceID, app.Active), token);
-            return ResponseHelper.ToResult<int, int>(result, () => { return result.Value; });
+            return ResponseHelper.ToResult(result, () => { return result.Value; });
         }
     }
     public static async Task<ResponseDTO<int>> ApplicationServiceDelete(
         [FromRoute] int id, CancellationToken token, IMediator mediator)
     {
         var result = await mediator.Send(new DeleteApplicationServiceCommand(id), token);
-        return ResponseHelper.ToResult<int, int>(result, () => { return result.Value; });
+        return ResponseHelper.ToResult(result, () => { return result.Value; });
     }
     private static ApplicationServiceParamDTO ToDto(Domain.Application.ApplicationService service) =>
         new(service.ID, service.ApplicationID, service.ServiceID)
