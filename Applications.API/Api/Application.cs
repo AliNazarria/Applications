@@ -1,9 +1,10 @@
 ﻿using Applications.API.Common;
 using Applications.API.Util;
-using Applications.Usecase.Application.Queries;
 using Applications.Usecase.Application.Commands;
+using Applications.Usecase.Application.Queries;
 using Applications.Usecase.Common.Models;
 using Asp.Versioning.Builder;
+using ErrorOr;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,51 +22,62 @@ public static class Application//: IEndpointRouteHandlerBuilder
 
         appActions.MapPut("/", AppSet);
         appActions.MapPost("/", AppReport);
-        appActions.MapGet("/{id:int}", AppGet).WithName(RouteNames.ApplicationSet);
+        appActions.MapGet("/{id:int}", AppGet).WithName(RouteNames.ApplicationGet.ToString());
         appActions.MapDelete("/{id:int}", AppDelete);
     }
 
-    public static async Task<ResponseDTO<ApplicationParamDTO>> AppGet([FromRoute] int id, CancellationToken token, IMediator mediator)
+    public static async Task<IResult> AppGet(
+        [FromRoute] int id,
+        CancellationToken token,
+        IMediator mediator,
+        IResponseHelper responseHelper)
     {
         var result = await mediator.Send(new GetApplicationQuery(id), token);
-        return ResponseHelper.ToDto(result, ToDto);
-        //return result.Match(
-        //    app => Results.Ok(ToDto(app))
-        //    , error => Results.NotFound(error)
-        //    );
+        return responseHelper.OkResult(result, ToDto);
     }
-    public static async Task<ResponseDTO<PaginatedListDTO<ApplicationParamDTO>>> AppReport([FromBody] ReportFilterDTO filter, CancellationToken token, IMediator mediator)
+    public static async Task<IResult> AppReport(
+        [FromBody] ReportFilterDTO filter,
+        CancellationToken token,
+        IMediator mediator,
+        IResponseHelper responseHelper)
     {
         var result = await mediator.Send(new ReportApplicationQuery(filter), token);
-        return ResponseHelper.ToDto(result, ToDto);
-        //return result.Match(
-        // response => Results.Ok(ToDto(response))
-        // , errors => Results.NotFound(errors)
-        // );
+        return responseHelper.OkResult(result, ToDto);
     }
-    public static async Task<ResponseDTO<int>> AppSet([FromBody] ApplicationParamDTO app, CancellationToken token, IMediator mediator)
+    public static async Task<IResult> AppSet(
+        [FromBody] ApplicationParamDTO app,
+        CancellationToken token,
+        IEndpointLinkGenerator linkGenerator,
+        HttpContext context,
+        IMediator mediator,
+        IResponseHelper responseHelper)
     {
+        ErrorOr<int> result;
         if (app.ID > 0)
         {
-            var result = await mediator.Send(new UpdateApplicationCommand(
+            result = await mediator.Send(new UpdateApplicationCommand(
                 app.ID, app.Key, app.Title, app.Comment, app.LogoAddress, app.Active), token);
-            return ResponseHelper.ToResult(result, () => { return result.Value; });
         }
         else
         {
-            var result = await mediator.Send(new AddApplicationCommand(
+            result = await mediator.Send(new AddApplicationCommand(
               app.Key, app.Title, app.Comment, app.LogoAddress, app.Active), token);
-            return ResponseHelper.ToResult(result, () => { return result.Value; });
         }
-        //return Results.CreatedAtRoute(RouteNames.ApplicationSet, new { id = result.Value }, result.Value);
-        //.Created<int>($"/{ApiResources.Applications}/{result.Value}",result.Value);
+
+        var location = linkGenerator.Url(context,RouteNames.ApplicationGet, new { id = result.Value });
+        return responseHelper.CreatedResult(result, () => { return result.Value; }, location);
     }
-    public static async Task<ResponseDTO<int>> AppDelete([FromRoute] int id, CancellationToken token, IMediator mediator)
+    public static async Task<IResult> AppDelete(
+        [FromRoute] int id,
+        CancellationToken token,
+        IEndpointLinkGenerator linkGenerator,
+        HttpContext context,
+        IMediator mediator,
+        IResponseHelper responseHelper)
     {
         var result = await mediator.Send(new DeleteApplicationCommand(id), token);
-        return ResponseHelper.ToResult(result, () => { return result.Value; });
-
-        //return Results.Created<long>($"/{ApiResources.Applications}/{resultId}", id);
+        var location = linkGenerator.Url(context, RouteNames.ApplicationDeletedGet, new { id = result.Value });
+        return responseHelper.CreatedResult(result, () => { return result.Value; }, location);
     }
     private static ApplicationParamDTO ToDto(Domain.Application.Application app) =>
         new(app.ID, app.Key.Value, app.Title.Value, app.Comment.Value, app.LogoAddress.Value)

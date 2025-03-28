@@ -1,57 +1,70 @@
-﻿namespace Applications.API.Common;
+﻿using ErrorOr;
+using Microsoft.Extensions.Localization;
 
-public record BaseParamDTO()
-{
-    public bool Active { get; init; }
-    public bool Deleted { get; init; }
-    public int? Created_By { get; init; }
-    public int? Created_At { get; init; }
-    public int? Updated_By { get; init; }
-    public int? Updated_At { get; init; }
-};
-public record ResponseDTO()
-{
-    public int status { get; init; } = 1;
-    public string message { get; init; }
-    public string[] errors { get; init; }
-};
-public record ResponseDTO<T>(T data = default) : ResponseDTO;
+namespace Applications.API.Common;
 
-public static class ResponseHelper
+public interface IResponseHelper
 {
-    public static ResponseDTO ToError(int status, string message)
+    IResult ErrorResult(Error error);
+    IResult CreatedResult<TEntity, TDto>(ErrorOr<TEntity> result, Func<TDto> mapper, string location);
+    IResult AcceptedResult<TEntity, TDto>(ErrorOr<TEntity> result, Func<TDto> mapper, string location);
+    IResult OkResult<TEntity, TDto>(ErrorOr<TEntity> result, Func<TEntity, TDto> mapper);
+    IResult ErrorResult<TEntity>(ErrorOr<TEntity> result);
+}
+public class ResponseHelper(
+    IStringLocalizer<ResponseHelper> localizer
+    )
+    : IResponseHelper
+{
+    public IResult ErrorResult(Error error)
     {
-        return new ResponseDTO
+        return ErrorResult<int>(error.ToErrorOr<int>());
+    }
+    public IResult ErrorResult<TEntity>(ErrorOr<TEntity> result)
+    {
+        var response = new ResponseDTO()
         {
-            status = status,
-            message = message,
-            errors = [message],
+            Status = -1,
+            Message = localizer[result.FirstError.Description],
+            Errors = result.Errors.Select(x => localizer[x.Description].ToString()).ToArray()
         };
+
+        switch (result.FirstError.Type)
+        {
+            case ErrorType.NotFound:
+                return Results.NotFound(response);
+            case ErrorType.Unauthorized:
+                return Results.Unauthorized();
+            case ErrorType.Conflict:
+                return Results.Conflict(response);
+            case ErrorType.Validation:
+                return Results.UnprocessableEntity(response);
+            case ErrorType.Unexpected:
+            case ErrorType.Failure:
+            case ErrorType.Forbidden:
+            default:
+                return Results.BadRequest(response);
+        }
     }
-    public static ResponseDTO<TDto> ToResult<TEntity, TDto>(ErrorOr.ErrorOr<TEntity> result, Func<TDto> mapper)
+    public IResult OkResult<TEntity, TDto>(ErrorOr<TEntity> result, Func<TEntity, TDto> mapper)
     {
         if (result.IsError)
-            return new ResponseDTO<TDto>()
-            {
-                status = result.FirstError.NumericType,
-                message = result.FirstError.Description,
-                errors = result.Errors.Select(x => x.Description).ToArray()
-            };
+            return ErrorResult(result);
 
-        return new ResponseDTO<TDto>(data: mapper.Invoke());
+        return Results.Ok(new ResponseDTO<TDto>(data: mapper(result.Value)));
     }
-    public static ResponseDTO<TDto> ToDto<TEntity, TDto>(
-        ErrorOr.ErrorOr<TEntity> result,
-        Func<TEntity, TDto> mapper)
+    public IResult CreatedResult<TEntity, TDto>(ErrorOr<TEntity> result, Func<TDto> mapper, string location)
     {
         if (result.IsError)
-            return new ResponseDTO<TDto>()
-            {
-                status = result.FirstError.NumericType,
-                message = result.FirstError.Description,
-                errors = result.Errors.Select(x => x.Description).ToArray()
-            };
+            return ErrorResult(result);
 
-        return new ResponseDTO<TDto>(data: mapper(result.Value));
+        return Results.Created(location, new ResponseDTO<TDto>(data: mapper.Invoke()));
+    }
+    public IResult AcceptedResult<TEntity, TDto>(ErrorOr<TEntity> result, Func<TDto> mapper, string location)
+    {
+        if (result.IsError)
+            return ErrorResult(result);
+
+        return Results.Accepted(location, new ResponseDTO<TDto>(data: mapper.Invoke()));
     }
 }

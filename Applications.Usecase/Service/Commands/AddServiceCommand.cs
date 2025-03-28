@@ -18,19 +18,18 @@ public class AddServiceCommandValidator
     : AbstractValidator<AddServiceCommand>
 {
     public AddServiceCommandValidator(
-        IResourceLocalizer localizer,
         IServiceRepository serviceRepository,
         IDateTimeProvider dateTimeProvider)
     {
         RuleFor(x => x.Key)
             .NotNull().NotEmpty()
-            .WithMessage(localizer.Localize(Resources.ResourceKey.KeyInvalid));
+            .WithMessage(Resources.ResourceKey.KeyInvalid);
         RuleFor(x => x.Name)
             .NotNull().NotEmpty()
-            .WithMessage(localizer.Localize(Resources.ResourceKey.KeyInvalid));
+            .WithMessage(Resources.ResourceKey.KeyInvalid);
         RuleFor(x => x).MustAsync(async (command, token) =>
         {
             return await serviceRepository.IsUnique(0, command.Key);
-        }).WithMessage(localizer.Localize(Resources.ResourceKey.KeyIsDuplicated));
+        }).WithMessage(Resources.ResourceKey.KeyIsDuplicated);
     }
 }

@@ -9,15 +9,14 @@ using domain = Applications.Domain.Application;
 namespace Applications.Usecase.ApplicationServices.Queries;
 
 public class ReportApplicationServiceQueryHandler(
-    IGenericRepository<domain.ApplicationService, int> repository,
-    IResourceLocalizer localizer
+    IGenericRepository<domain.ApplicationService, int> repository
     )
     : IRequestHandler<ReportApplicationServiceQuery, ErrorOr<PaginatedListDTO<domain.ApplicationService>>>
 {
     public async Task<ErrorOr<PaginatedListDTO<ApplicationService>>> Handle(ReportApplicationServiceQuery request, CancellationToken cancellationToken)
     {
         //todo => deleted record !!!!!!
-        var predicateResult = PredicateBuilder.MakePredicate<domain.ApplicationService>(request.Filter.Filter, localizer);
+        var predicateResult = PredicateBuilder.MakePredicate<domain.ApplicationService>(request.Filter.Filter);
         if (predicateResult.IsError)
             return predicateResult.Errors;
 

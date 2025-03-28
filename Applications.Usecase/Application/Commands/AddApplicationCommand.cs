@@ -3,6 +3,7 @@ using Applications.Usecase.Common.Interfaces;
 using Applications.Usecase.Common.Security;
 using ErrorOr;
 using FluentValidation;
+using System.Net;
 
 namespace Applications.Usecase.Application.Commands;
 
@@ -20,19 +21,24 @@ public class AddApplicationCommandValidator
     : AbstractValidator<AddApplicationCommand>
 {
     public AddApplicationCommandValidator(
-        IResourceLocalizer localizer,
+        //IStringLocalizer<AddApplicationCommandValidator> localizer,
         IApplicationRepository applicationRepository,
         IDateTimeProvider dateTimeProvider)
     {
         RuleFor(x => x.Key)
             .NotNull().NotEmpty()
-            .WithMessage(localizer.Localize(Resources.ResourceKey.KeyInvalid));
+            .WithMessage(Resources.ResourceKey.KeyInvalid)
+            .WithErrorCode(HttpStatusCode.BadRequest.ToString());
+
         RuleFor(x => x.Title)
             .NotNull().NotEmpty()
-            .WithMessage(localizer.Localize(Resources.ResourceKey.KeyInvalid));
+            .WithMessage(Resources.ResourceKey.Application.TitleInvalid)
+            .WithErrorCode(HttpStatusCode.BadRequest.ToString());
+
         RuleFor(x => x).MustAsync(async (command, token) =>
         {
             return await applicationRepository.IsUnique(0, command.Key);
-        }).WithMessage(localizer.Localize(Resources.ResourceKey.KeyIsDuplicated));
+        }).WithMessage(Resources.ResourceKey.KeyIsDuplicated)
+        .WithErrorCode(HttpStatusCode.BadRequest.ToString());
     }
 }

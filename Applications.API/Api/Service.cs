@@ -4,6 +4,7 @@ using Applications.Usecase.Common.Models;
 using Applications.Usecase.Service.Commands;
 using Applications.Usecase.Service.Queries;
 using Asp.Versioning.Builder;
+using ErrorOr;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,43 +22,61 @@ public static class Service
 
         appActions.MapPut("/", ServiceSet);
         appActions.MapPost("/", ServiceReport);
-        appActions.MapGet("/{id:int}", ServiceGet);
+        appActions.MapGet("/{id:int}", ServiceGet).WithName(RouteNames.ServiceGet.ToString());
         appActions.MapDelete("/{id:int}", ServiceDelete);
     }
 
-    public static async Task<ResponseDTO<ServiceParamDTO>> ServiceGet(
-        [FromRoute] int id, CancellationToken token, IMediator mediator)
+    public static async Task<IResult> ServiceGet(
+        [FromRoute] int id,
+        CancellationToken token,
+        IMediator mediator,
+        IResponseHelper responseHelper)
     {
         var result = await mediator.Send(new GetServiceQuery(id), token);
-        return ResponseHelper.ToDto(result, ToDto);
+        return responseHelper.OkResult(result, ToDto);
     }
-    public static async Task<ResponseDTO<PaginatedListDTO<ServiceParamDTO>>> ServiceReport(
-        [FromBody] ReportFilterDTO filter, CancellationToken token, IMediator mediator)
+    public static async Task<IResult> ServiceReport(
+        [FromBody] ReportFilterDTO filter,
+        CancellationToken token,
+        IMediator mediator,
+        IResponseHelper responseHelper)
     {
         var result = await mediator.Send(new ReportServiceQuery(filter), token);
-        return ResponseHelper.ToDto(result, ToDto);
+        return responseHelper.OkResult(result, ToDto);
     }
-    public static async Task<ResponseDTO<int>> ServiceSet(
-        [FromBody] ServiceParamDTO service, CancellationToken token, IMediator mediator)
+    public static async Task<IResult> ServiceSet(
+        [FromBody] ServiceParamDTO service,
+        CancellationToken token,
+        IEndpointLinkGenerator linkGenerator,
+        HttpContext context,
+        IMediator mediator,
+        IResponseHelper responseHelper)
     {
+        ErrorOr<int> result;
         if (service.ID > 0)
         {
-            var result = await mediator.Send(new UpdateServiceCommand(
+            result = await mediator.Send(new UpdateServiceCommand(
                 service.ID, service.Key, service.Name, service.Active), token);
-            return ResponseHelper.ToResult(result, () => { return result.Value; });
         }
         else
         {
-            var result = await mediator.Send(new AddServiceCommand(
+            result = await mediator.Send(new AddServiceCommand(
               service.Key, service.Name, service.Active), token);
-            return ResponseHelper.ToResult(result, () => { return result.Value; });
         }
+        var location = linkGenerator.Url(context, RouteNames.ServiceGet, new { id = result.Value });
+        return responseHelper.CreatedResult(result, () => { return result.Value; }, location);
     }
-    public static async Task<ResponseDTO<int>> ServiceDelete(
-        [FromRoute] int id, CancellationToken token, IMediator mediator)
+    public static async Task<IResult> ServiceDelete(
+        [FromRoute] int id,
+        CancellationToken token,
+        IEndpointLinkGenerator linkGenerator,
+        HttpContext context,
+        IMediator mediator,
+        IResponseHelper responseHelper)
     {
         var result = await mediator.Send(new DeleteServiceCommand(id), token);
-        return ResponseHelper.ToResult(result, () => { return result.Value; });
+        var location = linkGenerator.Url(context, RouteNames.ServiceDeletedGet, new { id = result.Value });
+        return responseHelper.CreatedResult(result, () => { return result.Value; }, location);
     }
     private static ServiceParamDTO ToDto(Domain.Service.Service service) =>
         new(service.ID, service.Key.Value, service.Name.Value)

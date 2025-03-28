@@ -18,19 +18,4 @@
     <PackageReference Include="MediatR" Version="12.4.1" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Compile Update="Resources\fa.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>fa.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Update="Resources\fa.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>fa.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
-
 </Project>

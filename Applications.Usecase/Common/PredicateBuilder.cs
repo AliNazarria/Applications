@@ -22,7 +22,7 @@ public static class PredicateBuilder
         return Expression.Lambda<Func<T, bool>>
               (Expression.AndAlso(expr1.Body, invokedExpr), expr1.Parameters);
     }
-    public static ErrorOr<Expression<Func<T, bool>>> MakePredicate<T>(List<FilterDTO> filters, IResourceLocalizer localizer)
+    public static ErrorOr<Expression<Func<T, bool>>> MakePredicate<T>(List<FilterDTO> filters)
     {
         //todo => role and is delete and active
 
@@ -42,7 +42,7 @@ public static class PredicateBuilder
         }
         catch (Exception ex)
         {
-            return Error.Validation(description: localizer.Localize(CommonResourceKey.FilterInvalid));
+            return Error.Validation(description: Resources.CommonResourceKey.FilterInvalid);
         }
     }
 

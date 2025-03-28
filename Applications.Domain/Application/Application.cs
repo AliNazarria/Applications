@@ -1,5 +1,6 @@
 ﻿using Applications.Domain.Application.Events;
 using Applications.Domain.Common.ValueObjects;
+using Applications.Domain.Common;
 using ErrorOr;
 using SharedKernel;
 using System.Diagnostics;
@@ -70,7 +71,7 @@ public class Application : Entity<int>
         int createDate)
     {
         if (Services.Any(x => x.ServiceID == serviceId && x.Deleted == false))
-            return Error.Validation();//todo localizer
+            return Errors.ApplicationServiceIsDuplicate;
 
         Services.Add(new ApplicationService(this.ID, serviceId, active, user, createDate));
         return Result.Success;
@@ -82,7 +83,7 @@ public class Application : Entity<int>
     {
         var service = this.Services.FirstOrDefault(x => x.ID == serviceId);
         if (service is null)
-            return Error.Validation();//todo localizer
+            return Errors.ApplicationServiceNotFound;
 
         return service.Update(active, user, updateDate);
     }
@@ -92,7 +93,7 @@ public class Application : Entity<int>
     {
         var service = this.Services.FirstOrDefault(x => x.ID == serviceId);
         if (service is null)
-            return Error.Validation();//todo localizer
+            return Errors.ApplicationServiceNotFound;
 
         return service.Delete(user, deleteDate);
     }

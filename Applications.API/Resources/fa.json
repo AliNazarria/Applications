@@ -1,0 +1,20 @@
+{
+  "ApplicationDeletedFailed": "اپلیکیشن حذف نشد",
+  "ApplicationNotFound": "اپلیکیشن یافت نشد",
+  "ApplicationServiceDeletedFailed": "سرویس برنامه حذف نشد",
+  "ApplicationServiceNotFound": "سرویس برنامه یافت نشد",
+  "ApplicationServiceIsDuplicate": "سرویس برنامه تکراری است",
+  "ApplicationServiceSetFailed": "سرویس برنامه ذخیره نشد",
+  "ApplicationSetFailed": "اپلیکیشن ذخیره نشد",
+  "FilterInvalid": "فیلتر ورودی نامعتبر است",
+  "IdInvalid": "شناسه نامعتبر است",
+  "KeyInvalid": "کلید نامعتبر است",
+  "KeyIsDuplicated": "کلید تکراری است",
+  "NameInvalid": "نام نامعتبر است",
+  "ServiceDeletedFailed": "سرویس حذف نشد",
+  "ServiceNotFound": "سرویس یافت نشد",
+  "ServiceSetFailed": "سرویس ذخیره نشد",
+  "TitleInvalid": "عنوان نامعتبر است",
+  "UserIDIsRequired": "شناسه کاربر اجباری است",
+  "UserIDInvalid": "شناسه کاربر نامعتبر است"
+}

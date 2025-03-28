@@ -4,6 +4,7 @@ using Applications.Usecase.ApplicationServices.Commands;
 using Applications.Usecase.ApplicationServices.Queries;
 using Applications.Usecase.Common.Models;
 using Asp.Versioning.Builder;
+using ErrorOr;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -24,33 +25,48 @@ public static class ApplicationService
         appActions.MapDelete("/{id:int}", ApplicationServiceDelete);
     }
 
-    public static async Task<ResponseDTO<PaginatedListDTO<ApplicationServiceParamDTO>>> ApplicationServiceReport(
-        [FromBody] ReportFilterDTO filter, CancellationToken token, IMediator mediator)
+    public static async Task<IResult> ApplicationServiceReport(
+        [FromBody] ReportFilterDTO filter,
+        CancellationToken token,
+        IMediator mediator,
+        IResponseHelper responseHelper)
     {
         var result = await mediator.Send(new ReportApplicationServiceQuery(filter), token);
-        return ResponseHelper.ToDto(result, ToDto);
+        return responseHelper.OkResult(result, ToDto);
     }
-    public static async Task<ResponseDTO<int>> ApplicationServiceSet(
-        [FromBody] ApplicationServiceParamDTO app, CancellationToken token, IMediator mediator)
+    public static async Task<IResult> ApplicationServiceSet(
+        [FromBody] ApplicationServiceParamDTO app,
+        CancellationToken token,
+        IEndpointLinkGenerator linkGenerator,
+        HttpContext context,
+        IMediator mediator,
+        IResponseHelper responseHelper)
     {
+        ErrorOr<int> result;
         if (app.ID > 0)
         {
-            var result = await mediator.Send(new UpdateApplicationServiceCommand(
+            result = await mediator.Send(new UpdateApplicationServiceCommand(
                 app.ID, app.ApplicationID, app.ServiceID, app.Active), token);
-            return ResponseHelper.ToResult(result, () => { return result.Value; });
         }
         else
         {
-            var result = await mediator.Send(new AddApplicationServiceCommand(
+            result = await mediator.Send(new AddApplicationServiceCommand(
               app.ApplicationID, app.ServiceID, app.Active), token);
-            return ResponseHelper.ToResult(result, () => { return result.Value; });
         }
+        var location = linkGenerator.Url(context, RouteNames.ApplicationServiceGet, new { id = result.Value });
+        return responseHelper.CreatedResult(result, () => { return result.Value; }, location);
     }
-    public static async Task<ResponseDTO<int>> ApplicationServiceDelete(
-        [FromRoute] int id, CancellationToken token, IMediator mediator)
+    public static async Task<IResult> ApplicationServiceDelete(
+        [FromRoute] int id,
+        CancellationToken token,
+        IEndpointLinkGenerator linkGenerator,
+        HttpContext context,
+        IMediator mediator,
+        IResponseHelper responseHelper)
     {
         var result = await mediator.Send(new DeleteApplicationServiceCommand(id), token);
-        return ResponseHelper.ToResult(result, () => { return result.Value; });
+        var location = linkGenerator.Url(context, RouteNames.ApplicationServiceDeletedGet, new { id = result.Value });
+        return responseHelper.CreatedResult(result, () => { return result.Value; }, location);
     }
     private static ApplicationServiceParamDTO ToDto(Domain.Application.ApplicationService service) =>
         new(service.ID, service.ApplicationID, service.ServiceID)

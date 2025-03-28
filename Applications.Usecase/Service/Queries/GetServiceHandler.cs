@@ -6,8 +6,7 @@ using domain = Applications.Domain.Service;
 namespace Applications.Usecase.Service.Queries;
 
 public class GetServiceHandler(
-    IGenericRepository<domain.Service, int> repository,
-    IResourceLocalizer localizer
+    IGenericRepository<domain.Service, int> repository
     ) : IRequestHandler<GetServiceQuery, ErrorOr<domain.Service>>
 {
     public async Task<ErrorOr<domain.Service>> Handle(GetServiceQuery request, CancellationToken cancellationToken)
@@ -18,6 +17,6 @@ public class GetServiceHandler(
         if (result is domain.Service)
             return result;
 
-        return Error.NotFound(description: localizer.Localize(Resources.ResourceKey.Service.NotFound));
+        return Error.NotFound(description: Resources.ResourceKey.Service.NotFound);
     }
 }

@@ -23,22 +23,21 @@ public class UpdateApplicationCommandValidator
     : AbstractValidator<UpdateApplicationCommand>
 {
     public UpdateApplicationCommandValidator(
-        IResourceLocalizer localizer,
         IApplicationRepository applicationRepository,
         IDateTimeProvider dateTimeProvider)
     {
         RuleFor(x => x.ID)
             .GreaterThan(0)
-            .WithMessage(localizer.Localize(Resources.ResourceKey.IdInvalid));
+            .WithMessage(Resources.ResourceKey.IdInvalid);
         RuleFor(x => x.Key)
             .NotNull().NotEmpty()
-            .WithMessage(localizer.Localize(Resources.ResourceKey.KeyInvalid));
+            .WithMessage(Resources.ResourceKey.KeyInvalid);
         RuleFor(x => x.Title)
             .NotNull().NotEmpty()
-            .WithMessage(localizer.Localize(Resources.ResourceKey.Application.TitleInvalid));
+            .WithMessage(Resources.ResourceKey.Application.TitleInvalid);
         RuleFor(x => x).MustAsync(async (command, token) =>
         {
             return await applicationRepository.IsUnique(command.ID, command.Key);
-        }).WithMessage(localizer.Localize(Resources.ResourceKey.KeyIsDuplicated));
+        }).WithMessage(Resources.ResourceKey.KeyIsDuplicated);
     }
 }

@@ -15,10 +15,10 @@ public record GetApplicationQuery(int ID)
 public class GetApplicationQueryValidator
     : AbstractValidator<GetApplicationQuery>
 {
-    public GetApplicationQueryValidator(IResourceLocalizer localizer)
+    public GetApplicationQueryValidator()
     {
         RuleFor(x => x.ID)
             .GreaterThan(0)
-            .WithMessage(localizer.Localize(Resources.ResourceKey.IdInvalid));
+            .WithMessage(Resources.ResourceKey.IdInvalid);
     }
 }

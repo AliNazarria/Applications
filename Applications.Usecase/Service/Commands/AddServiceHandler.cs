@@ -7,7 +7,6 @@ namespace Applications.Usecase.Service.Commands;
 
 public class AddServiceHandler(
     IGenericRepository<domain.Service, int> repository,
-    IResourceLocalizer localizer,
     IUserContextProvider userContext,
     IDateTimeProvider dateTimeProvider)
     : IRequestHandler<AddServiceCommand, ErrorOr<int>>
@@ -25,6 +24,6 @@ public class AddServiceHandler(
         if (result > 0)
             return result;
 
-        return Error.Failure(description: localizer.Localize(Resources.ResourceKey.Service.SetFailed));
+        return Error.Failure(description: Resources.ResourceKey.Service.SetFailed);
     }
 }

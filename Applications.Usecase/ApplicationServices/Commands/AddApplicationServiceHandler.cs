@@ -8,7 +8,6 @@ namespace Applications.Usecase.ApplicationServices.Commands;
 public class AddApplicationServiceHandler(
     IGenericRepository<domain.Application, int> repository,
     IUserContextProvider userContext,
-    IResourceLocalizer localizer,
     IDateTimeProvider dateTimeProvider
     )
     : IRequestHandler<AddApplicationServiceCommand, ErrorOr<int>>
@@ -19,7 +18,7 @@ public class AddApplicationServiceHandler(
         option.Includes = [a => a.Services.Where(x => x.Deleted == false)];
         var application = await repository.GetAsync(request.application, option, cancellationToken);
         if (application is null)
-            return Error.NotFound(description: localizer.Localize(Resources.ResourceKey.Application.NotFound));
+            return Error.NotFound(description: Resources.ResourceKey.Application.NotFound);
 
         var addServiceResult = application.AddService(request.service,
             request.active,
@@ -32,6 +31,6 @@ public class AddApplicationServiceHandler(
         if (result > 0)
             return result;
 
-        return Error.Failure(description: localizer.Localize(Resources.ResourceKey.ApplicationService.SetFailed));
+        return Error.Failure(description: Resources.ResourceKey.ApplicationService.SetFailed);
     }
 }

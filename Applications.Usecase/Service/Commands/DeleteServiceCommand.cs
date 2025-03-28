@@ -14,10 +14,10 @@ public record DeleteServiceCommand(int ID)
 public class DeleteApplicationCommandValidator :
     AbstractValidator<DeleteServiceCommand>
 {
-    public DeleteApplicationCommandValidator(IResourceLocalizer localizer)
+    public DeleteApplicationCommandValidator()
     {
         RuleFor(x => x.ID)
             .GreaterThan(0)
-            .WithMessage(localizer.Localize(Resources.ResourceKey.IdInvalid));
+            .WithMessage(Resources.ResourceKey.IdInvalid);
     }
 }

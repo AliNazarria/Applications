@@ -1,0 +1,20 @@
+{
+  "ApplicationDeletedFailed": "Application Deleted Failed",
+  "ApplicationNotFound": "Application Not Found",
+  "ApplicationServiceDeletedFailed": "ApplicationService Deleted Failed",
+  "ApplicationServiceNotFound": "ApplicationService Not Found",
+  "ApplicationServiceIsDuplicate": "ApplicationService Is Duplicate",
+  "ApplicationServiceSetFailed": "ApplicationService Set Failed",
+  "ApplicationSetFailed": "Application Set Failed",
+  "FilterInvalid": "Filter Invalid",
+  "IdInvalid": "Id Invalid",
+  "KeyInvalid": "Key Invalid",
+  "KeyIsDuplicated": "Key Is Duplicated",
+  "NameInvalid": "Name Invalid",
+  "ServiceDeletedFailed": "Service Deleted Failed",
+  "ServiceNotFound": "Service Not Found",
+  "ServiceSetFailed": "Service Set Failed",
+  "TitleInvalid": "Title Invalid",
+  "UserIDIsRequired": "UserID Is Required",
+  "UserIDInvalid": "UserID Invalid"
+}

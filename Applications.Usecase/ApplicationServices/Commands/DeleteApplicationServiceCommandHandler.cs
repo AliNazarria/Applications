@@ -8,7 +8,6 @@ namespace Applications.Usecase.ApplicationServices.Commands;
 public class DeleteApplicationServiceCommandHandler(
     IGenericRepository<domain.ApplicationService, int> repository,
     IUserContextProvider userContext,
-    IResourceLocalizer localizer,
     IDateTimeProvider dateTimeProvider
     )
     : IRequestHandler<DeleteApplicationServiceCommand, ErrorOr<int>>
@@ -17,7 +16,7 @@ public class DeleteApplicationServiceCommandHandler(
     {
         var applicationService = await repository.GetAsync(request.ID, token: cancellationToken);
         if (applicationService is null)
-            return Error.NotFound(description: localizer.Localize(Resources.ResourceKey.ApplicationService.NotFound));
+            return Error.NotFound(description: Resources.ResourceKey.ApplicationService.NotFound);
 
         var appResult = applicationService.Delete(userContext.UserID, dateTimeProvider.NowTimeStampInSecound());
         if (appResult.IsError)
@@ -27,6 +26,6 @@ public class DeleteApplicationServiceCommandHandler(
         if (result > 0)
             return result;
 
-        return Error.Failure(description: localizer.Localize(Resources.ResourceKey.ApplicationService.DeletedFailed));
+        return Error.Failure(description: Resources.ResourceKey.ApplicationService.DeletedFailed);
     }
 }

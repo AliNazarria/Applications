@@ -7,7 +7,6 @@ namespace Applications.Usecase.Service.Commands;
 
 public class UpdateServiceHandler(
     IGenericRepository<domain.Service, int> repository,
-    IResourceLocalizer localizer,
     IUserContextProvider userContext,
     IDateTimeProvider dateTimeProvider)
     : IRequestHandler<UpdateServiceCommand, ErrorOr<int>>
@@ -17,7 +16,7 @@ public class UpdateServiceHandler(
     {
         var app = await repository.GetAsync(request.ID);
         if (app is null)
-            return Error.NotFound(description: localizer.Localize(Resources.ResourceKey.Service.NotFound));
+            return Error.NotFound(description: Resources.ResourceKey.Service.NotFound);
 
         app.Update(request.Key,
             request.Name,
@@ -29,6 +28,6 @@ public class UpdateServiceHandler(
         if (result > 0)
             return result;
 
-        return Error.Failure(description: localizer.Localize(Resources.ResourceKey.Service.SetFailed));
+        return Error.Failure(description: Resources.ResourceKey.Service.SetFailed);
     }
 }

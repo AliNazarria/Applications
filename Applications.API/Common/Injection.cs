@@ -1,6 +1,7 @@
-﻿using Applications.API.Util;
-using Asp.Versioning;
+﻿using Asp.Versioning;
+using Microsoft.Extensions.Localization;
 using Microsoft.OpenApi.Models;
+using System.Globalization;
 using System.Text.Json.Serialization;
 
 namespace Applications.API.Common;
@@ -49,11 +50,33 @@ public static class Injection
         });
         services.AddProblemDetails();
         services.RegisterHeaderCheck();
+        services.RegisterLocalization();
+        services.AddScoped<IResponseHelper, ResponseHelper>();
+        services.AddScoped<IEndpointLinkGenerator, EndpointLinkGenerator>();
         return services;
     }
-    public static IServiceCollection RegisterHeaderCheck(this IServiceCollection services)
+    private static IServiceCollection RegisterHeaderCheck(this IServiceCollection services)
     {
         services.AddScoped<CheckRequiredHeaderParameter>();
+        return services;
+    }
+    private static IServiceCollection RegisterLocalization(this IServiceCollection services)
+    {
+        services.AddSingleton<LocalizationMiddleware>();
+        services.AddDistributedMemoryCache();
+        services.AddLocalization();
+        services.AddSingleton<IStringLocalizerFactory, JsonStringLocalizerFactory>();
+        services.Configure<RequestLocalizationOptions>(options =>
+        {
+            var supportedCultures = new[]
+            {
+                new CultureInfo("fa"),
+                new CultureInfo("en")
+            };
+            options.SupportedCultures = supportedCultures;
+            options.SupportedUICultures = supportedCultures;
+        });
+
         return services;
     }
 
@@ -84,6 +107,15 @@ public static class Injection
         }
 
         app.UseHttpsRedirection();
+
+        var supportedCultures = new[] { "fa", "en" };
+        var localizationOptions = new RequestLocalizationOptions()
+            .SetDefaultCulture(supportedCultures[0])
+            .AddSupportedCultures(supportedCultures)
+            .AddSupportedUICultures(supportedCultures);
+        localizationOptions.ApplyCurrentCultureToResponseHeaders = true;
+        app.UseRequestLocalization(localizationOptions);
+        app.UseMiddleware<LocalizationMiddleware>();
 
         return app;
     }

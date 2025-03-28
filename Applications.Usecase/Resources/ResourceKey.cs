@@ -1,5 +1,9 @@
 ﻿namespace Applications.Usecase.Resources;
 
+public partial class CommonResourceKey
+{
+    public const string FilterInvalid = "FilterInvalid";
+}
 public class ResourceKey
 {
     public const string IdInvalid = "IdInvalid";

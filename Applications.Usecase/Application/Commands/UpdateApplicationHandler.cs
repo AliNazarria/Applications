@@ -6,7 +6,6 @@ using domain = Applications.Domain.Application;
 namespace Applications.Usecase.Application.Commands;
 
 public class UpdateApplicationHandler(
-    IResourceLocalizer localizer,
     IGenericRepository<domain.Application, int> repository,
     IUserContextProvider userContext,
     IDateTimeProvider dateTimeProvider)
@@ -17,7 +16,7 @@ public class UpdateApplicationHandler(
     {
         var app = await repository.GetAsync(request.ID);
         if (app is null)
-            return Error.NotFound(description: localizer.Localize(Resources.ResourceKey.Application.NotFound));
+            return Error.NotFound(description: Resources.ResourceKey.Application.NotFound);
 
         app.Update(request.Key,
             request.Title,
@@ -31,6 +30,6 @@ public class UpdateApplicationHandler(
         if (result > 0)
             return result;
 
-        return Error.Failure(description: localizer.Localize(Resources.ResourceKey.Application.SetFailed));
+        return Error.Failure(description: Resources.ResourceKey.Application.SetFailed);
     }
 }

@@ -7,7 +7,6 @@ namespace Applications.Usecase.Application.Commands;
 
 public class AddApplicationHandler(
     IGenericRepository<domain.Application, int> repository,
-    IResourceLocalizer localizer,
     IUserContextProvider userContext,
     IDateTimeProvider dateTimeProvider)
     : IRequestHandler<AddApplicationCommand, ErrorOr<int>>
@@ -27,6 +26,6 @@ public class AddApplicationHandler(
         if (result > 0)
             return result;
 
-        return Error.Failure(description: localizer.Localize(Resources.ResourceKey.Application.SetFailed));
+        return Error.Failure(description: Resources.ResourceKey.Application.SetFailed);
     }
 }

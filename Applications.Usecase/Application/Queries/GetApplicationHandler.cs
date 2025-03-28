@@ -6,8 +6,8 @@ using domain = Applications.Domain.Application;
 namespace Applications.Usecase.Application.Queries;
 
 public class GetApplicationHandler(
-    IGenericRepository<domain.Application, int> repository,
-    IResourceLocalizer localizer)
+    IGenericRepository<domain.Application, int> repository
+    )
     : IRequestHandler<GetApplicationQuery, ErrorOr<domain.Application>>
 {
     async Task<ErrorOr<domain.Application>> IRequestHandler<GetApplicationQuery, ErrorOr<domain.Application>>.Handle(
@@ -19,6 +19,6 @@ public class GetApplicationHandler(
         if (result is domain.Application)
             return result;
 
-        return Error.NotFound(description: localizer.Localize(Resources.ResourceKey.Application.NotFound));
+        return Error.NotFound(description: Resources.ResourceKey.Application.NotFound);
     }
 }

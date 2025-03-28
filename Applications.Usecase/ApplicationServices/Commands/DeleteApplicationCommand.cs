@@ -2,11 +2,6 @@
 using ErrorOr;
 using FluentValidation;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Applications.Usecase.ApplicationServices.Commands;
 
@@ -19,10 +14,10 @@ public record DeleteApplicationServiceCommand(int ID)
 public class DeleteApplicationServiceCommandValidator :
     AbstractValidator<DeleteApplicationServiceCommand>
 {
-    public DeleteApplicationServiceCommandValidator(IResourceLocalizer localizer)
+    public DeleteApplicationServiceCommandValidator()
     {
         RuleFor(x => x.ID)
             .GreaterThan(0)
-            .WithMessage(localizer.Localize(Resources.ResourceKey.IdInvalid));
+            .WithMessage(Resources.ResourceKey.IdInvalid);
     }
 }

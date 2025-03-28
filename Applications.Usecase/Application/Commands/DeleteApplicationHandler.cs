@@ -8,7 +8,6 @@ namespace Applications.Usecase.Application.Commands;
 public class DeleteApplicationHandler(
     IGenericRepository<domain.Application, int> repository,
     IDateTimeProvider dateTimeProvider,
-    IResourceLocalizer localizer,
     IUserContextProvider userContext)
     : IRequestHandler<DeleteApplicationCommand, ErrorOr<int>>
 {
@@ -17,7 +16,7 @@ public class DeleteApplicationHandler(
     {
         var app = await repository.GetAsync(request.ID);
         if (app is null)
-            return Error.NotFound(description: localizer.Localize(Resources.ResourceKey.Application.NotFound));
+            return Error.NotFound(description: Resources.ResourceKey.Application.NotFound);
 
         app.Delete(userContext.UserID, dateTimeProvider.NowTimeStampInSecound());
 
@@ -25,6 +24,6 @@ public class DeleteApplicationHandler(
         if (result > 0)
             return result;
 
-        return Error.Failure(description: localizer.Localize(Resources.ResourceKey.Application.DeletedFailed));
+        return Error.Failure(description: Resources.ResourceKey.Application.DeletedFailed);
     }
 }

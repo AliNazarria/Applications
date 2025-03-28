@@ -18,15 +18,14 @@ public class AddApplicationServiceCommandValidator
     : AbstractValidator<AddApplicationServiceCommand>
 {
     public AddApplicationServiceCommandValidator(
-        IResourceLocalizer localizer,
         IServiceRepository serviceRepository,
         IDateTimeProvider dateTimeProvider)
     {
         RuleFor(x => x.application)
             .NotNull().NotEmpty().GreaterThan(0)
-            .WithMessage(localizer.Localize(Resources.ResourceKey.IdInvalid));
+            .WithMessage(Resources.ResourceKey.IdInvalid);
         RuleFor(x => x.service)
             .NotNull().NotEmpty().GreaterThan(0)
-            .WithMessage(localizer.Localize(Resources.ResourceKey.IdInvalid));
+            .WithMessage(Resources.ResourceKey.IdInvalid);
     }
 }

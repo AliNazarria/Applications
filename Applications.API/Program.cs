@@ -2,7 +2,6 @@ using Applications.API.Api;
 using Applications.API.Common;
 using Applications.API.Util;
 using Applications.Infrastructure;
-using Applications.Usecase;
 using Asp.Versioning;
 using Asp.Versioning.Builder;
 
@@ -15,7 +14,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 var app = builder.Build();
 {
-    app.UseCommonAPI(versions,app.Environment.IsDevelopment());
+    app.UseCommonAPI(versions, app.Environment.IsDevelopment());
     app.UseCheckRequiredHeaderParameter(ApiResources.ApiBasePath);
     app.UseHealth();
 
@@ -31,7 +30,6 @@ var app = builder.Build();
     //invoice
 
     app.Services.EnsurePersistAndMigrate();
-    app.UseUsecase();
 
     app.Run();
 }

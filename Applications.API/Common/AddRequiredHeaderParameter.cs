@@ -6,7 +6,8 @@ using System.Reflection;
 
 namespace Applications.API.Common;
 
-public class CheckRequiredHeaderParameter() : IMiddleware
+public class CheckRequiredHeaderParameter(IResponseHelper responseHelper)
+    : IMiddleware
 {
     public Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
@@ -18,13 +19,21 @@ public class CheckRequiredHeaderParameter() : IMiddleware
                 && !context.Request.Headers.ContainsKey(item.Name))
             {
                 context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                context.Response.WriteAsJsonAsync(ResponseHelper.ToError(400, $"{item.Name} is required"));
+                return context.Response.WriteAsJsonAsync(responseHelper.ErrorResult(ErrorOr.Error.Unauthorized(code: nameof(item), description: $"{item.Name}IsRequired")));
             }
-            if (!info.AllowEmptyValue
-                && string.IsNullOrWhiteSpace(context.Request.Headers[item.Name]))
+
+
+            if (!info.AllowEmptyValue)
             {
-                context.Response.StatusCode = StatusCodes.Status401Unauthorized; ;
-                context.Response.WriteAsJsonAsync(ResponseHelper.ToError(400, $"{item.Name} is empty"));
+                int headerParameter;
+                var headerParameterValue = context.Request.Headers[item.Name];
+                bool isNumeric = int.TryParse(headerParameterValue, out headerParameter);
+                if ((isNumeric && headerParameter < 1)
+                    || string.IsNullOrWhiteSpace(headerParameterValue))
+                {
+                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                    return context.Response.WriteAsJsonAsync(responseHelper.ErrorResult(ErrorOr.Error.Unauthorized(code: nameof(item), description: $"{item.Name}Invalid")));
+                }
             }
         }
 
