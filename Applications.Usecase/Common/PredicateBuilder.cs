@@ -1,5 +1,6 @@
 ﻿using Applications.Usecase.Common.Models;
 using ErrorOr;
+using SharedKernel;
 using System.Linq.Expressions;
 using System.Reflection;
 using OperationType = Applications.Usecase.Common.Models.OperationType;
@@ -24,15 +25,12 @@ public static class PredicateBuilder
     }
     public static ErrorOr<Expression<Func<T, bool>>> MakePredicate<T>(List<FilterDTO> filters)
     {
-        //todo => role and is delete and active
-
         if (!filters?.Any() ?? true)
-            return True<T>();
+            filters = [];
+        if (filters.Any(f => f == null && string.IsNullOrWhiteSpace(f.Key)))
+            return Error.Validation(description: Resources.CommonResourceKey.FilterInvalid);
 
-        filters = filters.Where(f => f != null && !string.IsNullOrWhiteSpace(f.Key)).ToList();
-        if (!filters.Any())
-            return True<T>();
-
+        filters.Add(new FilterDTO(nameof(Entity.Deleted), "false", OperationType.Equal));
         try
         {
             var item = Expression.Parameter(typeof(T), "item");

@@ -21,24 +21,23 @@ public class AddApplicationCommandValidator
     : AbstractValidator<AddApplicationCommand>
 {
     public AddApplicationCommandValidator(
-        //IStringLocalizer<AddApplicationCommandValidator> localizer,
-        IApplicationRepository applicationRepository,
-        IDateTimeProvider dateTimeProvider)
+        IApplicationRepository applicationRepository
+        )
     {
-        RuleFor(x => x.Key)
-            .NotNull().NotEmpty()
-            .WithMessage(Resources.ResourceKey.KeyInvalid)
-            .WithErrorCode(HttpStatusCode.BadRequest.ToString());
-
         RuleFor(x => x.Title)
             .NotNull().NotEmpty()
             .WithMessage(Resources.ResourceKey.Application.TitleInvalid)
             .WithErrorCode(HttpStatusCode.BadRequest.ToString());
 
-        RuleFor(x => x).MustAsync(async (command, token) =>
-        {
-            return await applicationRepository.IsUnique(0, command.Key);
-        }).WithMessage(Resources.ResourceKey.KeyIsDuplicated)
-        .WithErrorCode(HttpStatusCode.BadRequest.ToString());
+        //RuleFor(x => x.Key)
+        //    .NotNull().NotEmpty()
+        //    .WithMessage(Resources.ResourceKey.KeyInvalid)
+        //    .WithErrorCode(HttpStatusCode.BadRequest.ToString());
+
+        //RuleFor(x => x).MustAsync(async (command, token) =>
+        //{
+        //    return await applicationRepository.IsUnique(0, command.Key);
+        //}).WithMessage(Resources.ResourceKey.KeyIsDuplicated)
+        //.WithErrorCode(HttpStatusCode.BadRequest.ToString());
     }
 }

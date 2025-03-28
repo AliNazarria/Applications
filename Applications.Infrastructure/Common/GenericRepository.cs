@@ -1,18 +1,14 @@
-﻿using Applications.Domain.Application;
-using Applications.Infrastructure.Common;
+﻿using Applications.Infrastructure.Common;
 using Applications.Usecase.Common.Interfaces;
 using Applications.Usecase.Common.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Microsoft.EntityFrameworkCore.Query;
 using SharedKernel;
 using System.ComponentModel;
 using System.Linq.Expressions;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Applications.Infrastructure.Persist.Repository;
 
-public class GenericRepository<TEntity, TID> 
+public class GenericRepository<TEntity, TID>
     : IGenericRepository<TEntity, TID>
     where TEntity : Entity<TID>
 {

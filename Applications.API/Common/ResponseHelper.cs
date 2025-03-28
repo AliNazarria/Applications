@@ -24,7 +24,7 @@ public class ResponseHelper(
     {
         var response = new ResponseDTO()
         {
-            Status = -1,
+            Status = StatusCodes.Status400BadRequest,
             Message = localizer[result.FirstError.Description],
             Errors = result.Errors.Select(x => localizer[x.Description].ToString()).ToArray()
         };
@@ -32,17 +32,23 @@ public class ResponseHelper(
         switch (result.FirstError.Type)
         {
             case ErrorType.NotFound:
+                response.Status = StatusCodes.Status404NotFound;
                 return Results.NotFound(response);
             case ErrorType.Unauthorized:
+                response.Status = StatusCodes.Status401Unauthorized;
                 return Results.Unauthorized();
             case ErrorType.Conflict:
+                response.Status = StatusCodes.Status409Conflict;
                 return Results.Conflict(response);
             case ErrorType.Validation:
+                response.Status = StatusCodes.Status422UnprocessableEntity;
                 return Results.UnprocessableEntity(response);
+            case ErrorType.Forbidden:
+                return Results.Forbid();
             case ErrorType.Unexpected:
             case ErrorType.Failure:
-            case ErrorType.Forbidden:
             default:
+                response.Status = StatusCodes.Status400BadRequest;
                 return Results.BadRequest(response);
         }
     }

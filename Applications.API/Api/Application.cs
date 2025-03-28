@@ -20,8 +20,9 @@ public static class Application//: IEndpointRouteHandlerBuilder
         .WithApiVersionSet(apiVersionSet)
         .MapToApiVersion(1);
 
-        appActions.MapPut("/", AppSet);
-        appActions.MapPost("/", AppReport);
+        appActions.MapPut("/{id:int}", AppUpdate);
+        appActions.MapPost("/", AppAdd);
+        appActions.MapPost("/getlist/{page:int}/{size:int}", AppReport);
         appActions.MapGet("/{id:int}", AppGet).WithName(RouteNames.ApplicationGet.ToString());
         appActions.MapDelete("/{id:int}", AppDelete);
     }
@@ -36,35 +37,41 @@ public static class Application//: IEndpointRouteHandlerBuilder
         return responseHelper.OkResult(result, ToDto);
     }
     public static async Task<IResult> AppReport(
-        [FromBody] ReportFilterDTO filter,
+        [FromBody] ReportFilterDTO? filter,
+        [FromRoute] int page,
+        [FromRoute] int size,
         CancellationToken token,
         IMediator mediator,
         IResponseHelper responseHelper)
     {
-        var result = await mediator.Send(new ReportApplicationQuery(filter), token);
+        var result = await mediator.Send(new ReportApplicationQuery(filter, page, size), token);
         return responseHelper.OkResult(result, ToDto);
     }
-    public static async Task<IResult> AppSet(
-        [FromBody] ApplicationParamDTO app,
+    public static async Task<IResult> AppAdd(
+    [FromBody] ApplicationInputDTO app,
+    CancellationToken token,
+    IEndpointLinkGenerator linkGenerator,
+    HttpContext context,
+    IMediator mediator,
+    IResponseHelper responseHelper)
+    {
+        ErrorOr<int> result = await mediator.Send(new AddApplicationCommand(
+              app.Key, app.Title, app.Comment, app.LogoAddress, app.Active), token);
+        var location = linkGenerator.Url(context, RouteNames.ApplicationGet, new { id = result.Value });
+        return responseHelper.CreatedResult(result, () => { return result.Value; }, location);
+    }
+    public static async Task<IResult> AppUpdate(
+        [FromBody] ApplicationInputDTO app,
+        [FromRoute] int id,
         CancellationToken token,
         IEndpointLinkGenerator linkGenerator,
         HttpContext context,
         IMediator mediator,
         IResponseHelper responseHelper)
     {
-        ErrorOr<int> result;
-        if (app.ID > 0)
-        {
-            result = await mediator.Send(new UpdateApplicationCommand(
-                app.ID, app.Key, app.Title, app.Comment, app.LogoAddress, app.Active), token);
-        }
-        else
-        {
-            result = await mediator.Send(new AddApplicationCommand(
-              app.Key, app.Title, app.Comment, app.LogoAddress, app.Active), token);
-        }
-
-        var location = linkGenerator.Url(context,RouteNames.ApplicationGet, new { id = result.Value });
+        ErrorOr<int> result = await mediator.Send(new UpdateApplicationCommand(
+               id, app.Key, app.Title, app.Comment, app.LogoAddress, app.Active), token);
+        var location = linkGenerator.Url(context, RouteNames.ApplicationGet, new { id = result.Value });
         return responseHelper.CreatedResult(result, () => { return result.Value; }, location);
     }
     public static async Task<IResult> AppDelete(
@@ -93,6 +100,11 @@ public static class Application//: IEndpointRouteHandlerBuilder
         new PaginatedListDTO<ApplicationParamDTO>(app.Items.ConvertAll(ToDto), app.TotalCount, app.PageNumber, app.Items.Count);
 }
 
+public record ApplicationInputDTO(
+    string Key,
+    string Title,
+    string? Comment,
+    string? LogoAddress) : BaseInputDTO();
 public record ApplicationParamDTO(
     int ID,
     string Key,

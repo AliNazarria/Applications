@@ -3,7 +3,6 @@ using Applications.Usecase.Common.Interfaces;
 using Applications.Usecase.Common.Security;
 using ErrorOr;
 using FluentValidation;
-using SharedKernel;
 
 namespace Applications.Usecase.Application.Commands;
 
@@ -23,21 +22,23 @@ public class UpdateApplicationCommandValidator
     : AbstractValidator<UpdateApplicationCommand>
 {
     public UpdateApplicationCommandValidator(
-        IApplicationRepository applicationRepository,
-        IDateTimeProvider dateTimeProvider)
+        IApplicationRepository applicationRepository
+        )
     {
         RuleFor(x => x.ID)
             .GreaterThan(0)
             .WithMessage(Resources.ResourceKey.IdInvalid);
-        RuleFor(x => x.Key)
-            .NotNull().NotEmpty()
-            .WithMessage(Resources.ResourceKey.KeyInvalid);
+
         RuleFor(x => x.Title)
             .NotNull().NotEmpty()
             .WithMessage(Resources.ResourceKey.Application.TitleInvalid);
-        RuleFor(x => x).MustAsync(async (command, token) =>
-        {
-            return await applicationRepository.IsUnique(command.ID, command.Key);
-        }).WithMessage(Resources.ResourceKey.KeyIsDuplicated);
+
+        //RuleFor(x => x.Key)
+        //    .NotNull().NotEmpty()
+        //    .WithMessage(Resources.ResourceKey.KeyInvalid);
+        //RuleFor(x => x).MustAsync(async (command, token) =>
+        //{
+        //    return await applicationRepository.IsUnique(command.ID, command.Key);
+        //}).WithMessage(Resources.ResourceKey.KeyIsDuplicated);
     }
 }

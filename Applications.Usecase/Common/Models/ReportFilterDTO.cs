@@ -3,8 +3,6 @@
 namespace Applications.Usecase.Common.Models;
 
 public record ReportFilterDTO(
-    int Page,
-    int Size,
     List<FilterDTO> Filter,
     string OrderBy)
 {

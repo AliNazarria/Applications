@@ -20,8 +20,9 @@ public static class Service
         .WithApiVersionSet(apiVersionSet)
         .MapToApiVersion(1);
 
-        appActions.MapPut("/", ServiceSet);
-        appActions.MapPost("/", ServiceReport);
+        appActions.MapPut("/{id:int}", ServiceUpdate);
+        appActions.MapPost("/", ServiceAdd);
+        appActions.MapPost("/getlist/{page:int}/{size:int}", ServiceReport);
         appActions.MapGet("/{id:int}", ServiceGet).WithName(RouteNames.ServiceGet.ToString());
         appActions.MapDelete("/{id:int}", ServiceDelete);
     }
@@ -36,33 +37,40 @@ public static class Service
         return responseHelper.OkResult(result, ToDto);
     }
     public static async Task<IResult> ServiceReport(
-        [FromBody] ReportFilterDTO filter,
+        [FromBody] ReportFilterDTO? filter,
+        [FromRoute] int page,
+        [FromRoute] int size,
         CancellationToken token,
         IMediator mediator,
         IResponseHelper responseHelper)
     {
-        var result = await mediator.Send(new ReportServiceQuery(filter), token);
+        var result = await mediator.Send(new ReportServiceQuery(filter, page, size), token);
         return responseHelper.OkResult(result, ToDto);
     }
-    public static async Task<IResult> ServiceSet(
-        [FromBody] ServiceParamDTO service,
+    public static async Task<IResult> ServiceAdd(
+    [FromBody] ServiceInputDTO service,
+    CancellationToken token,
+    IEndpointLinkGenerator linkGenerator,
+    HttpContext context,
+    IMediator mediator,
+    IResponseHelper responseHelper)
+    {
+        ErrorOr<int> result = await mediator.Send(new AddServiceCommand(
+              service.Key, service.Name, service.Active), token);
+        var location = linkGenerator.Url(context, RouteNames.ServiceGet, new { id = result.Value });
+        return responseHelper.CreatedResult(result, () => { return result.Value; }, location);
+    }
+    public static async Task<IResult> ServiceUpdate(
+        [FromBody] ServiceInputDTO service,
+        [FromRoute] int id,
         CancellationToken token,
         IEndpointLinkGenerator linkGenerator,
         HttpContext context,
         IMediator mediator,
         IResponseHelper responseHelper)
     {
-        ErrorOr<int> result;
-        if (service.ID > 0)
-        {
-            result = await mediator.Send(new UpdateServiceCommand(
-                service.ID, service.Key, service.Name, service.Active), token);
-        }
-        else
-        {
-            result = await mediator.Send(new AddServiceCommand(
-              service.Key, service.Name, service.Active), token);
-        }
+        ErrorOr<int> result = await mediator.Send(new UpdateServiceCommand(
+             id, service.Key, service.Name, service.Active), token);
         var location = linkGenerator.Url(context, RouteNames.ServiceGet, new { id = result.Value });
         return responseHelper.CreatedResult(result, () => { return result.Value; }, location);
     }
@@ -92,6 +100,10 @@ public static class Service
         new PaginatedListDTO<ServiceParamDTO>(service.Items.ConvertAll(ToDto), service.TotalCount, service.PageNumber, service.Items.Count);
 }
 
+public record ServiceInputDTO(
+    string Key,
+    string Name)
+    : BaseInputDTO();
 public record ServiceParamDTO(
     int ID,
     string Key,

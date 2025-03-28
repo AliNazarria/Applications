@@ -15,7 +15,6 @@ public class ReportApplicationServiceQueryHandler(
 {
     public async Task<ErrorOr<PaginatedListDTO<ApplicationService>>> Handle(ReportApplicationServiceQuery request, CancellationToken cancellationToken)
     {
-        //todo => deleted record !!!!!!
         var predicateResult = PredicateBuilder.MakePredicate<domain.ApplicationService>(request.Filter.Filter);
         if (predicateResult.IsError)
             return predicateResult.Errors;
@@ -23,8 +22,8 @@ public class ReportApplicationServiceQueryHandler(
         var opt = FindOptions<domain.ApplicationService>.ReportOptions();
         var result = await repository.GetPagedAsync(predicateResult.Value
             , request.Filter.OrderBy
-            , request.Filter.Page
-            , request.Filter.Size
+            , request.Page
+            , request.Size
             , findOptions: opt
             , token: cancellationToken);
         return result;

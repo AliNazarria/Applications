@@ -1,5 +1,9 @@
 ﻿namespace Applications.API.Common;
 
+public record BaseInputDTO()
+{
+    public bool Active { get; init; }
+}
 public record BaseParamDTO()
 {
     public bool Active { get; init; }

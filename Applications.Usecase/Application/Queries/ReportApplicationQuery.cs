@@ -8,7 +8,7 @@ using domain = Applications.Domain.Application;
 namespace Applications.Usecase.Application.Queries;
 
 [Authorize(Permissions = Permissions.Application.Report, Policies = Policy.Guest, Roles = "")]
-public record ReportApplicationQuery(ReportFilterDTO Filter)
+public record ReportApplicationQuery(ReportFilterDTO? Filter, int Page, int Size)
     : IAuthorizeableRequest<ErrorOr<PaginatedListDTO<domain.Application>>>
 {
 }

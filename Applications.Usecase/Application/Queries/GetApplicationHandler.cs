@@ -13,12 +13,11 @@ public class GetApplicationHandler(
     async Task<ErrorOr<domain.Application>> IRequestHandler<GetApplicationQuery, ErrorOr<domain.Application>>.Handle(
         GetApplicationQuery request, CancellationToken cancellationToken)
     {
-        //todo => check deleted
         var option = FindOptions<domain.Application>.ReportOptions();
         var result = await repository.GetAsync(request.ID, findOptions: option, token: cancellationToken);
-        if (result is domain.Application)
-            return result;
+        if (result is null || result.Deleted)
+            return Error.NotFound(description: Resources.ResourceKey.Application.NotFound);
 
-        return Error.NotFound(description: Resources.ResourceKey.Application.NotFound);
+        return result;
     }
 }
