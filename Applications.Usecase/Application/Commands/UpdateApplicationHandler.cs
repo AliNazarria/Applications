@@ -14,6 +14,7 @@ public class UpdateApplicationHandler(
     async Task<ErrorOr<int>> IRequestHandler<UpdateApplicationCommand, ErrorOr<int>>.Handle(
         UpdateApplicationCommand request, CancellationToken cancellationToken)
     {
+        //todo => delete
         var app = await repository.GetAsync(request.ID);
         if (app is null)
             return Error.NotFound(description: Resources.ResourceKey.Application.NotFound);

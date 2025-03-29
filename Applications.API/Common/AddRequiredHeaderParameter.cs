@@ -1,12 +1,16 @@
 ﻿using Applications.API.Util;
 using Applications.Usecase.Common.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using System;
 using System.Reflection;
 
 namespace Applications.API.Common;
 
-public class CheckRequiredHeaderParameter(IResponseHelper responseHelper)
+public class CheckRequiredHeaderParameter(
+    ILogger<CheckRequiredHeaderParameter> logger
+    )
     : IMiddleware
 {
     public Task InvokeAsync(HttpContext context, RequestDelegate next)
@@ -18,8 +22,9 @@ public class CheckRequiredHeaderParameter(IResponseHelper responseHelper)
             if (info.Required
                 && !context.Request.Headers.ContainsKey(item.Name))
             {
-                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                return context.Response.WriteAsJsonAsync(responseHelper.ErrorResult(ErrorOr.Error.Unauthorized(code: nameof(item), description: $"{item.Name}IsRequired")));
+                var problemDetails = ResponseDTO.Unauthorized($"{item.Name}IsRequired");
+                context.Response.StatusCode = problemDetails.Status;
+                return context.Response.WriteAsJsonAsync(problemDetails);
             }
 
 
@@ -31,8 +36,9 @@ public class CheckRequiredHeaderParameter(IResponseHelper responseHelper)
                 if ((isNumeric && headerParameter < 1)
                     || string.IsNullOrWhiteSpace(headerParameterValue))
                 {
-                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                    return context.Response.WriteAsJsonAsync(responseHelper.ErrorResult(ErrorOr.Error.Unauthorized(code: nameof(item), description: $"{item.Name}Invalid")));
+                    var problemDetails = ResponseDTO.Unauthorized($"{item.Name}Invalid");
+                    context.Response.StatusCode = problemDetails.Status;
+                    return context.Response.WriteAsJsonAsync(problemDetails);
                 }
             }
         }

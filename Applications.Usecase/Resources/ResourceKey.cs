@@ -1,9 +1,5 @@
 ﻿namespace Applications.Usecase.Resources;
 
-public partial class CommonResourceKey
-{
-    public const string FilterInvalid = "FilterInvalid";
-}
 public class ResourceKey
 {
     public const string IdInvalid = "IdInvalid";
@@ -16,12 +12,6 @@ public class ResourceKey
         public const string NotFound = "ApplicationNotFound";
         public const string SetFailed = "ApplicationSetFailed";
         public const string DeletedFailed = "ApplicationDeletedFailed";
-    }
-    public class ApplicationService
-    {
-        public const string NotFound = "ApplicationServiceNotFound";
-        public const string SetFailed = "ApplicationServiceSetFailed";
-        public const string DeletedFailed = "ApplicationServiceDeletedFailed";
     }
     public class Service
     {

@@ -14,13 +14,13 @@ public class AddServiceHandler(
     async Task<ErrorOr<int>> IRequestHandler<AddServiceCommand, ErrorOr<int>>.Handle(
         AddServiceCommand request, CancellationToken cancellationToken)
     {
-        var app = new domain.Service(
+        var service = new domain.Service(
             request.Key,
             request.Name,
             request.Active,
             userContext.UserID,
             dateTimeProvider.NowTimeStampInSecound());
-        var result = await repository.InsertAsync(app);
+        var result = await repository.InsertAsync(service);
         if (result > 0)
             return result;
 

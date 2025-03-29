@@ -8,7 +8,7 @@ public class KeyValueObject : ValueObject
     private KeyValueObject() { }
     public KeyValueObject(string key)
     {
-        ArgumentNullException.ThrowIfNullOrWhiteSpace(key);
+        //ArgumentNullException.ThrowIfNullOrWhiteSpace(key);
         if (key.Length > 150)
             throw new ArgumentOutOfRangeException(nameof(key));
 

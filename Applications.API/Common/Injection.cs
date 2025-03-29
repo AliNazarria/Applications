@@ -8,8 +8,10 @@ namespace Applications.API.Common;
 
 public static class Injection
 {
-    public static IServiceCollection RegisterCommonAPI(this IServiceCollection services
-        , Dictionary<string, string> versions)
+    private static string CorsPolicyName = "AllowMyOrigins";
+    public static IServiceCollection RegisterCommonAPI(this IServiceCollection services,
+        IConfiguration configuration,
+        Dictionary<string, string> versions)
     {
         var versionBuilder = services.AddApiVersioning(options =>
         {
@@ -48,11 +50,21 @@ public static class Injection
                 return apiDescriptions.First();
             });
         });
+        services.AddExceptionHandler<GlobalExceptionHandler>();
         services.AddProblemDetails();
         services.RegisterHeaderCheck();
         services.RegisterLocalization();
         services.AddScoped<IResponseHelper, ResponseHelper>();
         services.AddScoped<IEndpointLinkGenerator, EndpointLinkGenerator>();
+        services.AddCors(options =>
+        {
+            string[] allowedOrigins = configuration.GetSection("AllowedOrigins").Get<string[]>() ?? [];
+            options.AddPolicy(CorsPolicyName, policy => policy
+            .WithOrigins(allowedOrigins)
+            .AllowCredentials()
+            .AllowAnyHeader()
+            .AllowAnyMethod());
+        });
         return services;
     }
     private static IServiceCollection RegisterHeaderCheck(this IServiceCollection services)
@@ -90,10 +102,12 @@ public static class Injection
             context => context.Request.Path.StartsWithSegments($"/{apiBaseAddress}"),
             builder => builder.UseMiddleware<CheckRequiredHeaderParameter>());
     }
-    public static IApplicationBuilder UseCommonAPI(this IApplicationBuilder app
-        , Dictionary<string, string> versions, bool isDevelopment)
+    public static IApplicationBuilder UseCommonAPI(this IApplicationBuilder app,
+         Dictionary<string, string> versions,
+         bool isDevelopment)
     {
-        app.UseExceptionHandler("/Error");
+        app.UseExceptionHandler();
+        //app.UseExceptionHandler("/Error");
         if (isDevelopment)
         {
             app.UseSwagger();
@@ -106,8 +120,6 @@ public static class Injection
             });
         }
 
-        app.UseHttpsRedirection();
-
         var supportedCultures = new[] { "fa", "en" };
         var localizationOptions = new RequestLocalizationOptions()
             .SetDefaultCulture(supportedCultures[0])
@@ -116,6 +128,8 @@ public static class Injection
         localizationOptions.ApplyCurrentCultureToResponseHeaders = true;
         app.UseRequestLocalization(localizationOptions);
         app.UseMiddleware<LocalizationMiddleware>();
+        app.UseCors(CorsPolicyName);
+        app.UseHttpsRedirection();
 
         return app;
     }

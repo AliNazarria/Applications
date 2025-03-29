@@ -14,13 +14,14 @@ public class DeleteServiceHandler(
     public async Task<ErrorOr<int>> Handle(DeleteServiceCommand request
         , CancellationToken cancellationToken)
     {
-        var app = await repository.GetAsync(request.ID);
-        if (app is null)
+        //todo => deleted
+        var service = await repository.GetAsync(request.ID);
+        if (service is null)
             return Error.NotFound(description: Resources.ResourceKey.Service.NotFound);
 
-        app.Delete(userContext.UserID, dateTimeProvider.NowTimeStampInSecound());
+        service.Delete(userContext.UserID, dateTimeProvider.NowTimeStampInSecound());
 
-        var result = await repository.UpdateAsync(app);
+        var result = await repository.UpdateAsync(service);
         if (result > 0)
             return result;
 

@@ -28,7 +28,7 @@ public static class PredicateBuilder
         if (!filters?.Any() ?? true)
             filters = [];
         if (filters.Any(f => f == null && string.IsNullOrWhiteSpace(f.Key)))
-            return Error.Validation(description: Resources.CommonResourceKey.FilterInvalid);
+            return Errors.FilterInvalid();
 
         filters.Add(new FilterDTO(nameof(Entity.Deleted), "false", OperationType.Equal));
         try
@@ -40,7 +40,7 @@ public static class PredicateBuilder
         }
         catch (Exception ex)
         {
-            return Error.Validation(description: Resources.CommonResourceKey.FilterInvalid);
+            return Errors.FilterInvalid();
         }
     }
 

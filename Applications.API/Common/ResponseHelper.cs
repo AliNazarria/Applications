@@ -22,34 +22,24 @@ public class ResponseHelper(
     }
     public IResult ErrorResult<TEntity>(ErrorOr<TEntity> result)
     {
-        var response = new ResponseDTO()
-        {
-            Status = StatusCodes.Status400BadRequest,
-            Message = localizer[result.FirstError.Description],
-            Errors = result.Errors.Select(x => localizer[x.Description].ToString()).ToArray()
-        };
-
+        var message = localizer[result.FirstError.Description];
+        var errors = result.Errors.Select(x => localizer[x.Description].ToString()).ToArray();
         switch (result.FirstError.Type)
         {
             case ErrorType.NotFound:
-                response.Status = StatusCodes.Status404NotFound;
-                return Results.NotFound(response);
+                return Results.NotFound(ResponseDTO.Error(StatusCodes.Status404NotFound, message, errors));
             case ErrorType.Unauthorized:
-                response.Status = StatusCodes.Status401Unauthorized;
                 return Results.Unauthorized();
             case ErrorType.Conflict:
-                response.Status = StatusCodes.Status409Conflict;
-                return Results.Conflict(response);
+                return Results.Conflict(ResponseDTO.Error(StatusCodes.Status409Conflict, message, errors));
             case ErrorType.Validation:
-                response.Status = StatusCodes.Status422UnprocessableEntity;
-                return Results.UnprocessableEntity(response);
+                return Results.UnprocessableEntity(ResponseDTO.Error(StatusCodes.Status422UnprocessableEntity, message, errors));
             case ErrorType.Forbidden:
                 return Results.Forbid();
             case ErrorType.Unexpected:
             case ErrorType.Failure:
             default:
-                response.Status = StatusCodes.Status400BadRequest;
-                return Results.BadRequest(response);
+                return Results.BadRequest(ResponseDTO.Error(StatusCodes.Status400BadRequest, message, errors));
         }
     }
     public IResult OkResult<TEntity, TDto>(ErrorOr<TEntity> result, Func<TEntity, TDto> mapper)

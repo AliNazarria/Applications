@@ -8,7 +8,7 @@ using Asp.Versioning.Builder;
 var versions = new Dictionary<string, string>() { { "v1", "Application" } };
 var builder = WebApplication.CreateBuilder(args);
 {
-    builder.Services.RegisterCommonAPI(versions);
+    builder.Services.RegisterCommonAPI(builder.Configuration, versions);
     builder.Services.RegisterInfrastructure(builder.Configuration, builder.Environment.IsDevelopment());
 }
 

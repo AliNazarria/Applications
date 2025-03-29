@@ -14,6 +14,7 @@ public class DeleteApplicationHandler(
     public async Task<ErrorOr<int>> Handle(DeleteApplicationCommand request
         , CancellationToken cancellationToken)
     {
+        //todo => deleted
         var app = await repository.GetAsync(request.ID);
         if (app is null)
             return Error.NotFound(description: Resources.ResourceKey.Application.NotFound);

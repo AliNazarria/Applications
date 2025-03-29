@@ -14,17 +14,18 @@ public class UpdateServiceHandler(
     async Task<ErrorOr<int>> IRequestHandler<UpdateServiceCommand, ErrorOr<int>>.Handle(
         UpdateServiceCommand request, CancellationToken cancellationToken)
     {
-        var app = await repository.GetAsync(request.ID);
-        if (app is null)
+        //todo => delete
+        var service = await repository.GetAsync(request.ID);
+        if (service is null)
             return Error.NotFound(description: Resources.ResourceKey.Service.NotFound);
 
-        app.Update(request.Key,
+        service.Update(request.Key,
             request.Name,
             request.Active,
             userContext.UserID,
             dateTimeProvider.NowTimeStampInSecound());
 
-        var result = await repository.UpdateAsync(app);
+        var result = await repository.UpdateAsync(service);
         if (result > 0)
             return result;
 

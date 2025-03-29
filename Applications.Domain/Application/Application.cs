@@ -71,30 +71,30 @@ public class Application : Entity<int>
         int createDate)
     {
         if (Services.Any(x => x.ServiceID == serviceId && x.Deleted == false))
-            return Errors.ApplicationServiceIsDuplicate;
+            return Errors.ApplicationServiceIsDuplicate();
 
         Services.Add(new ApplicationService(this.ID, serviceId, active, user, createDate));
         return Result.Success;
     }
-    public ErrorOr<Success> UpdateService(int serviceId,
-        bool active,
-        int user,
-        int updateDate)
-    {
-        var service = this.Services.FirstOrDefault(x => x.ID == serviceId);
-        if (service is null)
-            return Errors.ApplicationServiceNotFound;
+    //public ErrorOr<Success> UpdateService(int serviceId,
+    //    bool active,
+    //    int user,
+    //    int updateDate)
+    //{
+    //    var service = this.Services.FirstOrDefault(x => x.ID == serviceId);
+    //    if (service is null)
+    //        return Errors.ApplicationServiceNotFound;
 
-        return service.Update(active, user, updateDate);
-    }
-    public ErrorOr<Success> DeleteService(int serviceId,
-        int user,
-        int deleteDate)
-    {
-        var service = this.Services.FirstOrDefault(x => x.ID == serviceId);
-        if (service is null)
-            return Errors.ApplicationServiceNotFound;
+    //    return service.Update(active, user, updateDate);
+    //}
+    //public ErrorOr<Success> DeleteService(int serviceId,
+    //    int user,
+    //    int deleteDate)
+    //{
+    //    var service = this.Services.FirstOrDefault(x => x.ID == serviceId);
+    //    if (service is null)
+    //        return Errors.ApplicationServiceNotFound;
 
-        return service.Delete(user, deleteDate);
-    }
+    //    return service.Delete(user, deleteDate);
+    //}
 }

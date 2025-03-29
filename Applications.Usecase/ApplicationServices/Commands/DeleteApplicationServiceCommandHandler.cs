@@ -16,7 +16,7 @@ public class DeleteApplicationServiceCommandHandler(
     {
         var applicationService = await repository.GetAsync(request.ID, token: cancellationToken);
         if (applicationService is null)
-            return Error.NotFound(description: Resources.ResourceKey.ApplicationService.NotFound);
+            return domain.Errors.ApplicationServiceNotFound();
 
         var appResult = applicationService.Delete(userContext.UserID, dateTimeProvider.NowTimeStampInSecound());
         if (appResult.IsError)
@@ -26,6 +26,6 @@ public class DeleteApplicationServiceCommandHandler(
         if (result > 0)
             return result;
 
-        return Error.Failure(description: Resources.ResourceKey.ApplicationService.DeletedFailed);
+        return Errors.ApplicationServiceDeleteFailed();
     }
 }

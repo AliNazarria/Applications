@@ -13,21 +13,27 @@ public class ApplicationService : Entity<int>
     public int ServiceID { get; private set; }
 
     private ApplicationService() { }
-    public ApplicationService(int app,
+    public ApplicationService(int application,
         int service,
         bool active,
         int user,
         int createDate)
     {
-        this.ApplicationID = app;
+        this.ApplicationID = application;
         this.ServiceID = service;
         if (active)
             this.Activated();
         this.Create(user, createDate);
         RegisterDomainEvent(new ApplicationServiceAddEvent(this));
     }
-    public ErrorOr<Success> Update(bool active, int user, int updateDate)
+    public ErrorOr<Success> Update(int application, 
+        int service, 
+        bool active, 
+        int user, 
+        int updateDate)
     {
+        this.ApplicationID = application;
+        this.ServiceID = service;
         if (!active)
             this.Deactive();
 

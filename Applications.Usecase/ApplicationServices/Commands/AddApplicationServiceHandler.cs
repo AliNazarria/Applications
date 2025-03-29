@@ -31,6 +31,6 @@ public class AddApplicationServiceHandler(
         if (result > 0)
             return result;
 
-        return Error.Failure(description: Resources.ResourceKey.ApplicationService.SetFailed);
+        return Errors.ApplicationServiceSetFailed();
     }
 }

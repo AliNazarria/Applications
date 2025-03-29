@@ -11,9 +11,10 @@ public class GetServiceHandler(
 {
     public async Task<ErrorOr<domain.Service>> Handle(GetServiceQuery request, CancellationToken cancellationToken)
     {
+        //todo => delete
         var opt = FindOptions<domain.Service>.ReportOptions();
         var result = await repository.GetAsync(request.ID, findOptions: opt, token: cancellationToken);
-        if (result is null || result.Deleted)
+        if (result is null)
             return Error.NotFound(description: Resources.ResourceKey.Service.NotFound);
 
         return result;
