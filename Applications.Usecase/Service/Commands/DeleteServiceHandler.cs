@@ -1,12 +1,13 @@
 ﻿using Applications.Usecase.Common.Interfaces;
 using ErrorOr;
 using MediatR;
+using Microsoft.Extensions.DependencyInjection;
 using domain = Applications.Domain.Service;
 
 namespace Applications.Usecase.Service.Commands;
 
 public class DeleteServiceHandler(
-    IGenericRepository<domain.Service, int> repository,
+    [FromKeyedServices("proxy")] IGenericRepository<domain.Service, int> repository,
     IDateTimeProvider dateTimeProvider,
     IUserContextProvider userContext)
     : IRequestHandler<DeleteServiceCommand, ErrorOr<int>>
@@ -14,7 +15,6 @@ public class DeleteServiceHandler(
     public async Task<ErrorOr<int>> Handle(DeleteServiceCommand request
         , CancellationToken cancellationToken)
     {
-        //todo => deleted
         var service = await repository.GetAsync(request.ID);
         if (service is null)
             return Error.NotFound(description: Resources.ResourceKey.Service.NotFound);

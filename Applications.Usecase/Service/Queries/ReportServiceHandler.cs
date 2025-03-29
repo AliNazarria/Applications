@@ -3,12 +3,13 @@ using Applications.Usecase.Common.Interfaces;
 using Applications.Usecase.Common.Models;
 using ErrorOr;
 using MediatR;
+using Microsoft.Extensions.DependencyInjection;
 using domain = Applications.Domain.Service;
 
 namespace Applications.Usecase.Service.Queries;
 
 public class ReportServiceHandler(
-    IGenericRepository<domain.Service, int> repository
+    [FromKeyedServices("proxy")] IGenericRepository<domain.Service, int> repository
     )
     : IRequestHandler<ReportServiceQuery, ErrorOr<PaginatedListDTO<domain.Service>>>
 {

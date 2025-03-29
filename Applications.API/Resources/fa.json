@@ -16,5 +16,6 @@
   "ServiceSetFailed": "سرویس ذخیره نشد",
   "TitleInvalid": "عنوان نامعتبر است",
   "UserIDIsRequired": "شناسه کاربر اجباری است",
-  "UserIDInvalid": "شناسه کاربر نامعتبر است"
+  "UserIDInvalid": "شناسه کاربر نامعتبر است",
+  "PageSizeInvalid": "تعداد رکورد نامعتبر است"
 }

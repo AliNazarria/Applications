@@ -26,11 +26,10 @@ public static class PredicateBuilder
     public static ErrorOr<Expression<Func<T, bool>>> MakePredicate<T>(List<FilterDTO> filters)
     {
         if (!filters?.Any() ?? true)
-            filters = [];
-        if (filters.Any(f => f == null && string.IsNullOrWhiteSpace(f.Key)))
+            return True<T>();
+        if (filters.Any(f => f == null || string.IsNullOrWhiteSpace(f.Key)))
             return Errors.FilterInvalid();
 
-        filters.Add(new FilterDTO(nameof(Entity.Deleted), "false", OperationType.Equal));
         try
         {
             var item = Expression.Parameter(typeof(T), "item");

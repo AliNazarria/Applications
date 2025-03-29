@@ -16,5 +16,6 @@
   "ServiceSetFailed": "Service Set Failed",
   "TitleInvalid": "Title Invalid",
   "UserIDIsRequired": "UserID Is Required",
-  "UserIDInvalid": "UserID Invalid"
+  "UserIDInvalid": "UserID Invalid",
+  "PageSizeInvalid": "Page Size Invalid"
 }

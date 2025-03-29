@@ -1,12 +1,13 @@
 ﻿using Applications.Usecase.Common.Interfaces;
 using ErrorOr;
 using MediatR;
+using Microsoft.Extensions.DependencyInjection;
 using domain = Applications.Domain.Application;
 
 namespace Applications.Usecase.Application.Commands;
 
 public class DeleteApplicationHandler(
-    IGenericRepository<domain.Application, int> repository,
+    [FromKeyedServices("proxy")] IGenericRepository<domain.Application, int> repository,
     IDateTimeProvider dateTimeProvider,
     IUserContextProvider userContext)
     : IRequestHandler<DeleteApplicationCommand, ErrorOr<int>>
@@ -14,7 +15,6 @@ public class DeleteApplicationHandler(
     public async Task<ErrorOr<int>> Handle(DeleteApplicationCommand request
         , CancellationToken cancellationToken)
     {
-        //todo => deleted
         var app = await repository.GetAsync(request.ID);
         if (app is null)
             return Error.NotFound(description: Resources.ResourceKey.Application.NotFound);

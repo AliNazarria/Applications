@@ -12,12 +12,14 @@ public class GenericRepository<TEntity, TID>
     : IGenericRepository<TEntity, TID>
     where TEntity : Entity<TID>
 {
-    protected readonly AppDbContext _dbContext;
+    protected readonly AppDbContext dbContext;
+    public readonly IUserContextProvider userContext;
     private bool _disposed;
 
-    public GenericRepository(AppDbContext context)
+    public GenericRepository(AppDbContext dbcontext, IUserContextProvider usercontext)
     {
-        _dbContext = context;
+        dbContext = dbcontext;
+        userContext = usercontext;
     }
 
     public async Task<TEntity> GetAsync(TID id
@@ -52,7 +54,7 @@ public class GenericRepository<TEntity, TID>
     public async Task<IEnumerable<string>> NavigationsAsync(CancellationToken token = default)
     {
         var entityNavigations = new List<string>();
-        foreach (var property in _dbContext.Model.FindEntityType(typeof(TEntity)).GetNavigations())
+        foreach (var property in dbContext.Model.FindEntityType(typeof(TEntity)).GetNavigations())
             entityNavigations.Add(property.Name);
 
         return entityNavigations;
@@ -61,73 +63,73 @@ public class GenericRepository<TEntity, TID>
         , CancellationToken token = default)
     {
         ArgumentNullException.ThrowIfNull(predicate);
-        return await _dbContext.Set<TEntity>().CountAsync(predicate);
+        return await dbContext.Set<TEntity>().CountAsync(predicate);
     }
     public async Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> predicate
         , CancellationToken token = default)
     {
         ArgumentNullException.ThrowIfNull(predicate);
-        return await _dbContext.Set<TEntity>().CountAsync(predicate) != 0;
+        return await dbContext.Set<TEntity>().CountAsync(predicate) != 0;
     }
     public async Task<TEntity> FirstAsync(Expression<Func<TEntity, bool>> predicate
         , CancellationToken token = default)
     {
         ArgumentNullException.ThrowIfNull(predicate);
-        return await _dbContext.Set<TEntity>().FirstOrDefaultAsync(predicate);
+        return await dbContext.Set<TEntity>().FirstOrDefaultAsync(predicate);
     }
 
     public async Task<TID> InsertAsync(TEntity entity)
     {
-        _dbContext.Set<TEntity>().Add(entity);
-        var result = await _dbContext.SaveChangesAsync();
+        dbContext.Set<TEntity>().Add(entity);
+        var result = await dbContext.SaveChangesAsync();
         return entity.ID;
     }
     public async Task<bool> InsertRangeAsync(IEnumerable<TEntity> entities)
     {
-        _dbContext.Set<TEntity>().AddRangeAsync(entities);
-        var result = await _dbContext.SaveChangesAsync();
+        dbContext.Set<TEntity>().AddRangeAsync(entities);
+        var result = await dbContext.SaveChangesAsync();
         return result > 0;
     }
     public async Task<TID> UpdateAsync(TEntity entity)
     {
-        _dbContext.Entry(entity).State = EntityState.Modified;
-        var result = await _dbContext.SaveChangesAsync();
+        dbContext.Entry(entity).State = EntityState.Modified;
+        var result = await dbContext.SaveChangesAsync();
         return entity.ID;
     }
     public async Task<bool> UpdateBatchAsync(IEnumerable<TEntity> entities)
     {
-        var keys = _dbContext.Model.FindEntityType(typeof(TEntity)).GetKeys();
+        var keys = dbContext.Model.FindEntityType(typeof(TEntity)).GetKeys();
         var primaryKeys = keys.SelectMany(x => x.Properties).Where(x => x.IsPrimaryKey() == true).Select(x => x.Name).ToList();
         foreach (var entity in entities)
         {
             var value = TypeDescriptor.GetProperties(entity)[primaryKeys.FirstOrDefault()].GetValue(entity);
-            var entry = _dbContext.Set<TEntity>().Find(value);
+            var entry = dbContext.Set<TEntity>().Find(value);
             if (entry == null)
-                await _dbContext.Set<TEntity>().AddAsync(entity);
+                await dbContext.Set<TEntity>().AddAsync(entity);
             else
             {
-                _dbContext.Set<TEntity>().Attach(entity);
-                _dbContext.Entry(entity).State = EntityState.Modified;
+                dbContext.Set<TEntity>().Attach(entity);
+                dbContext.Entry(entity).State = EntityState.Modified;
             }
         }
-        var result = await _dbContext.SaveChangesAsync();
+        var result = await dbContext.SaveChangesAsync();
         return result > 0;
     }
     public async Task<TID> DeleteAsync(TID id)
     {
-        var entity = await _dbContext.Set<TEntity>().FindAsync(id);
+        var entity = await dbContext.Set<TEntity>().FindAsync(id);
         if (entity == null)
         {
             return default;
         }
-        _dbContext.Set<TEntity>().Remove(entity);
-        var result = await _dbContext.SaveChangesAsync();
+        dbContext.Set<TEntity>().Remove(entity);
+        var result = await dbContext.SaveChangesAsync();
         return id;
     }
     public async Task<bool> DeleteRangeAsync(IEnumerable<TEntity> entities)
     {
-        _dbContext.Set<TEntity>().RemoveRange(entities);
-        var result = await _dbContext.SaveChangesAsync();
+        dbContext.Set<TEntity>().RemoveRange(entities);
+        var result = await dbContext.SaveChangesAsync();
         return result > 0;
     }
 
@@ -142,7 +144,7 @@ public class GenericRepository<TEntity, TID>
         {
             if (disposing)
             {
-                _dbContext.Dispose();
+                dbContext.Dispose();
             }
         }
         _disposed = true;
@@ -151,7 +153,7 @@ public class GenericRepository<TEntity, TID>
     private DbSet<TEntity> Get(FindOptions<TEntity>? findOptions = null)
     {
         findOptions ??= new FindOptions<TEntity>();
-        var entity = _dbContext.Set<TEntity>();
+        var entity = dbContext.Set<TEntity>();
         if (findOptions.IsIgnoreAutoIncludes)
         {
             entity.IgnoreAutoIncludes();

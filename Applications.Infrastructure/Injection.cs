@@ -1,5 +1,4 @@
-﻿using Applications.Domain;
-using Applications.Infrastructure.Common;
+﻿using Applications.Infrastructure.Common;
 using Applications.Infrastructure.Persist;
 using Applications.Infrastructure.Persist.Repository;
 using Applications.Usecase;
@@ -40,10 +39,8 @@ public static class Injection
         services.AddDbContext<AppDbContext>(options =>
         {
             options.UseSqlServer(connectionString);
-            //.UseLazyLoadingProxies()
-            //options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
         });
-        services.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));
+        services.AddKeyedScoped(typeof(IGenericRepository<,>), "real", typeof(GenericRepository<,>));
         services.AddScoped<IApplicationRepository, ApplicationRepository>();
         services.AddScoped<IServiceRepository, ServiceRepository>();
 

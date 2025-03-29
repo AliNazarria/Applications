@@ -1,4 +1,5 @@
-﻿using Applications.Usecase.Common.Interfaces;
+﻿using Applications.Usecase.Common;
+using Applications.Usecase.Common.Interfaces;
 using Applications.Usecase.Common.Models;
 using Applications.Usecase.Common.Security;
 using ErrorOr;
@@ -18,6 +19,8 @@ public class ReportServiceQueryValidator :
 {
     public ReportServiceQueryValidator()
     {
-        //todo => filter validation !!!!!
+        RuleFor(x => x.Size)
+            .GreaterThan(Constants.MaxPageSize)
+            .WithMessage(Resources.ResourceKey.PageSizeInvalid);
     }
 }

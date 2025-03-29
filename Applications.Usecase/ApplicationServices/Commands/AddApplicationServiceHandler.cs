@@ -1,12 +1,13 @@
 ﻿using Applications.Usecase.Common.Interfaces;
 using ErrorOr;
 using MediatR;
+using Microsoft.Extensions.DependencyInjection;
 using domain = Applications.Domain.Application;
 
 namespace Applications.Usecase.ApplicationServices.Commands;
 
 public class AddApplicationServiceHandler(
-    IGenericRepository<domain.Application, int> repository,
+    [FromKeyedServices("proxy")] IGenericRepository<domain.Application, int> repository,
     IUserContextProvider userContext,
     IDateTimeProvider dateTimeProvider
     )
