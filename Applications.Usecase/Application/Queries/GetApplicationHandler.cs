@@ -1,13 +1,11 @@
-﻿using Applications.Usecase.Common.Interfaces;
-using ErrorOr;
-using MediatR;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Applications.Usecase.Common;
+using Applications.Usecase.Common.Interfaces;
 using domain = Applications.Domain.Application;
 
 namespace Applications.Usecase.Application.Queries;
 
 public class GetApplicationHandler(
-    [FromKeyedServices("proxy")] IGenericRepository<domain.Application, int> repository
+    [FromKeyedServices(Constants.Proxy)] IGenericRepository<domain.Application, int> repository
     )
     : IRequestHandler<GetApplicationQuery, ErrorOr<domain.Application>>
 {

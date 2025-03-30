@@ -1,13 +1,11 @@
-﻿using Applications.Usecase.Common.Interfaces;
-using ErrorOr;
-using MediatR;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Applications.Usecase.Common;
+using Applications.Usecase.Common.Interfaces;
 using domain = Applications.Domain.Service;
 
 namespace Applications.Usecase.Service.Commands;
 
 public class AddServiceHandler(
-    [FromKeyedServices("proxy")] IGenericRepository<domain.Service, int> repository,
+    [FromKeyedServices(Constants.Proxy)] IGenericRepository<domain.Service, int> repository,
     IUserContextProvider userContext,
     IDateTimeProvider dateTimeProvider)
     : IRequestHandler<AddServiceCommand, ErrorOr<int>>

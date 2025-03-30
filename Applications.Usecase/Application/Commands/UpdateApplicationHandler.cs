@@ -1,4 +1,5 @@
-﻿using Applications.Usecase.Common.Interfaces;
+﻿using Applications.Usecase.Common;
+using Applications.Usecase.Common.Interfaces;
 using ErrorOr;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
@@ -7,7 +8,7 @@ using domain = Applications.Domain.Application;
 namespace Applications.Usecase.Application.Commands;
 
 public class UpdateApplicationHandler(
-    [FromKeyedServices("proxy")] IGenericRepository<domain.Application, int> repository,
+    [FromKeyedServices(Constants.Proxy)] IGenericRepository<domain.Application, int> repository,
     IUserContextProvider userContext,
     IDateTimeProvider dateTimeProvider)
     : IRequestHandler<UpdateApplicationCommand, ErrorOr<int>>

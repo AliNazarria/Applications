@@ -19,7 +19,7 @@ public static class Injection
     public static IServiceCollection RegisterCommonServices(this IServiceCollection services, Assembly assembly, bool isDevelopment)
     {
         services.AddScoped<IDomainEventDispatcher, MediatRDomainEventDispatcher>();
-        services.AddKeyedScoped(typeof(IGenericRepository<,>), "proxy", typeof(GenericRepositoryDeletedProxy<,>));
+        services.AddKeyedScoped(typeof(IGenericRepository<,>), Constants.Proxy, typeof(GenericRepositoryDeletedProxy<,>));
         services.AddMediatR(options =>
         {
             options.RegisterServicesFromAssembly(assembly);

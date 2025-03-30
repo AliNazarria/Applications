@@ -1,13 +1,12 @@
 ﻿using Applications.Usecase.Common.Interfaces;
 using Applications.Usecase.Common.Models;
-using Microsoft.Extensions.DependencyInjection;
 using SharedKernel;
 using System.Linq.Expressions;
 
 namespace Applications.Usecase.Common;
 
 public class GenericRepositoryDeletedProxy<TEntity, TID>(
-      [FromKeyedServices("real")] IGenericRepository<TEntity, TID> repository
+      [FromKeyedServices(Constants.Real)] IGenericRepository<TEntity, TID> repository
     )
     : IGenericRepository<TEntity, TID>
     where TEntity : Entity<TID>
