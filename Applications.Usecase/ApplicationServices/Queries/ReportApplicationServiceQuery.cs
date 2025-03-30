@@ -20,7 +20,7 @@ public class ReportApplicationServiceQueryValidator :
     public ReportApplicationServiceQueryValidator()
     {
         RuleFor(x => x.Size)
-            .GreaterThan(Constants.MaxPageSize)
+            .GreaterThanOrEqualTo(Constants.MaxPageSize)
             .WithMessage(Resources.ResourceKey.PageSizeInvalid);
     }
 }

@@ -35,20 +35,20 @@ public abstract class Entity
     {
         this.Active = true;
     }
-    protected void Create(int user, int time)
+    protected void Create(Guid user, int time)
     {
         this.Created_By = user;
         this.Created_At = time;
     }
-    protected void Update(int user, int time)
+    protected void Update(Guid user, int time)
     {
         this.Updated_By = user;
         this.Updated_At = time;
     }
     public bool Deleted { get; private set; }
     public bool Active { get; private set; }
-    public int? Created_By { get; private set; }
+    public Guid? Created_By { get; private set; }
     public int? Created_At { get; private set; }
-    public int? Updated_By { get; private set; }
+    public Guid? Updated_By { get; private set; }
     public int? Updated_At { get; private set; }
 }

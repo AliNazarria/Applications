@@ -23,7 +23,7 @@ public class Application : Entity<int>
         string key,
         string title,
         bool active,
-        int userId,
+        Guid userId,
         int createDate,
         string? comment = null,
         string? logo = null)
@@ -41,7 +41,7 @@ public class Application : Entity<int>
     public ErrorOr<Success> Update(string key,
         string title,
         bool active,
-        int userId,
+        Guid userId,
         int updateDate,
         string? comment = null,
         string? logo = null)
@@ -57,7 +57,7 @@ public class Application : Entity<int>
         return Result.Success;
     }
 
-    public ErrorOr<Success> Delete(int user, int deleteDate)
+    public ErrorOr<Success> Delete(Guid user, int deleteDate)
     {
         this.SoftDelete();
         this.Update(user, deleteDate);
@@ -67,7 +67,7 @@ public class Application : Entity<int>
 
     public ErrorOr<Success> AddService(int serviceId,
         bool active,
-        int user,
+        Guid user,
         int createDate)
     {
         if (Services.Any(x => x.ServiceID == serviceId && x.Deleted == false))

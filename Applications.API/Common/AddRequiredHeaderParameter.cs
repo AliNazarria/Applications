@@ -1,6 +1,7 @@
 ﻿using Applications.API.Util;
 using Applications.Usecase.Common.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System;
@@ -65,6 +66,7 @@ public class AddRequiredHeaderParameter : IOperationFilter
                 AllowEmptyValue = info?.AllowEmptyValue ?? false,
                 Required = info?.Required ?? true,
                 Description = info?.Description ?? "",
+                Example = new OpenApiString(info?.Example),
             });
         }
     }

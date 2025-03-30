@@ -13,7 +13,7 @@ public class AuthorizationServiceProvider(IUserContextProvider userContext)
         List<string> requiredPolicies)
     {
         //todo
-        if (userContext.UserID < 1)
+        if (userContext.UserID == Guid.Empty)
             return Error.Unauthorized();
 
         return Result.Success;

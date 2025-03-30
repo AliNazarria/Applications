@@ -16,7 +16,7 @@ public class Service : Entity<int>
     public Service(string key,
         string name,
         bool active,
-        int userId,
+        Guid userId,
         int createDate)
     {
         this.Key = new KeyValueObject(key);
@@ -30,7 +30,7 @@ public class Service : Entity<int>
     public ErrorOr<Success> Update(string key,
         string name,
         bool active,
-        int userId,
+        Guid userId,
         int updateDate)
     {
         this.Key = new KeyValueObject(key);
@@ -41,7 +41,7 @@ public class Service : Entity<int>
         RegisterDomainEvent(new ServiceUpdateEvent(this));
         return Result.Success;
     }
-    public ErrorOr<Success> Delete(int user, int deleteDate)
+    public ErrorOr<Success> Delete(Guid user, int deleteDate)
     {
         this.SoftDelete();
         this.Update(user, deleteDate);

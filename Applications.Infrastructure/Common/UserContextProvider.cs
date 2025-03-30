@@ -1,14 +1,15 @@
 ﻿using Applications.Usecase.Common.Interfaces;
 using Microsoft.AspNetCore.Http;
+using System.ComponentModel;
 
 namespace Applications.Infrastructure.Common;
 
-public sealed class UserContextProvider(IHttpContextAccessor httpContextAccessor) 
+public sealed class UserContextProvider(IHttpContextAccessor httpContextAccessor)
     : IUserContextProvider
 {
     public int AppID => GetHeader<int>(nameof(AppID));
     public int ServiceID => GetHeader<int>(nameof(ServiceID));
-    public int UserID => GetHeader<int>(nameof(UserID));
+    public Guid UserID => GetHeader<Guid>(nameof(UserID));
     public string Language => GetHeader<string>(nameof(Language));
     public string CorrelationId => GetHeader<string>(nameof(CorrelationId));
 
@@ -22,7 +23,7 @@ public sealed class UserContextProvider(IHttpContextAccessor httpContextAccessor
             var valueString = headerValues.FirstOrDefault();
             if (valueString != null)
             {
-                return (T)Convert.ChangeType(valueString, typeof(T));
+                return (T)TypeDescriptor.GetConverter(typeof(T)).ConvertFromInvariantString(valueString);
             }
         }
 

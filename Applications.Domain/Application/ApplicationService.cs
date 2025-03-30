@@ -16,7 +16,7 @@ public class ApplicationService : Entity<int>
     public ApplicationService(int application,
         int service,
         bool active,
-        int user,
+        Guid user,
         int createDate)
     {
         this.ApplicationID = application;
@@ -28,8 +28,8 @@ public class ApplicationService : Entity<int>
     }
     public ErrorOr<Success> Update(int application, 
         int service, 
-        bool active, 
-        int user, 
+        bool active,
+        Guid user, 
         int updateDate)
     {
         this.ApplicationID = application;
@@ -41,7 +41,7 @@ public class ApplicationService : Entity<int>
         RegisterDomainEvent(new ApplicationServiceUpdateEvent(this));
         return Result.Success;
     }
-    public ErrorOr<Success> Delete(int user, int deleteDate)
+    public ErrorOr<Success> Delete(Guid user, int deleteDate)
     {
         this.SoftDelete();
         this.Update(user, deleteDate);
