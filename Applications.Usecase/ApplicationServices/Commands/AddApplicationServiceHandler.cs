@@ -17,7 +17,7 @@ public class AddApplicationServiceHandler(
         option.Includes = [a => a.Services.Where(x => x.Deleted == false)];
         var application = await repository.GetAsync(request.application, option, cancellationToken);
         if (application is null)
-            return Error.NotFound(description: Resources.ResourceKey.Application.NotFound);
+            return Application.Errors.ApplicationNotFound();
 
         var addServiceResult = application.AddService(request.service,
             request.active,

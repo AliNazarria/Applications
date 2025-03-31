@@ -23,7 +23,7 @@ public class AddServiceCommandValidator
     {
         RuleFor(x => x.Name)
             .NotNull().NotEmpty()
-            .WithMessage(Resources.ResourceKey.Service.NameInvalid);
+            .WithMessage(Resources.ResourceKey.NameInvalid);
 
         //RuleFor(x => x.Key)
         //    .NotNull().NotEmpty()

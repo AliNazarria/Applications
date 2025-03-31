@@ -25,6 +25,6 @@ public class AddApplicationHandler(
         if (result > 0)
             return result;
 
-        return Error.Failure(description: Resources.ResourceKey.Application.SetFailed);
+        return Errors.ApplicationSetFailed();
     }
 }

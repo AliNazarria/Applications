@@ -15,7 +15,7 @@ public class DeleteApplicationHandler(
     {
         var app = await repository.GetAsync(request.ID);
         if (app is null)
-            return Error.NotFound(description: Resources.ResourceKey.Application.NotFound);
+            return Errors.ApplicationNotFound();
 
         app.Delete(userContext.UserID, dateTimeProvider.NowTimeStampInSecound());
 
@@ -23,6 +23,6 @@ public class DeleteApplicationHandler(
         if (result > 0)
             return result;
 
-        return Error.Failure(description: Resources.ResourceKey.Application.DeletedFailed);
+        return Errors.ApplicationDeletedFailed();
     }
 }

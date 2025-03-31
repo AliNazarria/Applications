@@ -18,7 +18,7 @@ public class UpdateApplicationHandler(
     {
         var app = await repository.GetAsync(request.ID);
         if (app is null)
-            return Error.NotFound(description: Resources.ResourceKey.Application.NotFound);
+            return Errors.ApplicationNotFound();
 
         app.Update(request.Key,
             request.Title,
@@ -32,6 +32,6 @@ public class UpdateApplicationHandler(
         if (result > 0)
             return result;
 
-        return Error.Failure(description: Resources.ResourceKey.Application.SetFailed);
+        return Errors.ApplicationSetFailed();
     }
 }

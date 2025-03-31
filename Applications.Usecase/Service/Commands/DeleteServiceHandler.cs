@@ -15,7 +15,7 @@ public class DeleteServiceHandler(
     {
         var service = await repository.GetAsync(request.ID);
         if (service is null)
-            return Error.NotFound(description: Resources.ResourceKey.Service.NotFound);
+            return Errors.ServiceNotFound();
 
         service.Delete(userContext.UserID, dateTimeProvider.NowTimeStampInSecound());
 
@@ -23,6 +23,6 @@ public class DeleteServiceHandler(
         if (result > 0)
             return result;
 
-        return Error.Failure(description: Resources.ResourceKey.Service.DeletedFailed);
+        return Errors.ServiceDeletedFailed();
     }
 }

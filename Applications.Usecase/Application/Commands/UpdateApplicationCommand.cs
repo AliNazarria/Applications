@@ -31,7 +31,7 @@ public class UpdateApplicationCommandValidator
 
         RuleFor(x => x.Title)
             .NotNull().NotEmpty()
-            .WithMessage(Resources.ResourceKey.Application.TitleInvalid);
+            .WithMessage(Resources.ResourceKey.TitleInvalid);
 
         //RuleFor(x => x.Key)
         //    .NotNull().NotEmpty()

@@ -26,7 +26,7 @@ public class AddApplicationCommandValidator
     {
         RuleFor(x => x.Title)
             .NotNull().NotEmpty()
-            .WithMessage(Resources.ResourceKey.Application.TitleInvalid)
+            .WithMessage(Resources.ResourceKey.TitleInvalid)
             .WithErrorCode(HttpStatusCode.BadRequest.ToString());
 
         //RuleFor(x => x.Key)

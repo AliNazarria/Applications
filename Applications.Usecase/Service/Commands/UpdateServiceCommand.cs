@@ -1,7 +1,6 @@
 ﻿using Applications.Usecase.Common.Interfaces;
 using Applications.Usecase.Common.Security;
 using Applications.Usecase.Service.Interfaces;
-using ErrorOr;
 using FluentValidation;
 
 namespace Applications.Usecase.Service.Commands;
@@ -24,7 +23,7 @@ public class UpdateServiceCommandValidator
     {
         RuleFor(x => x.Name)
             .NotNull().NotEmpty()
-            .WithMessage(Resources.ResourceKey.Service.NameInvalid);
+            .WithMessage(Resources.ResourceKey.NameInvalid);
 
         //RuleFor(x => x.Key)
         //    .NotNull().NotEmpty()

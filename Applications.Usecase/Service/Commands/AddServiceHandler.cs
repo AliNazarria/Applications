@@ -23,6 +23,6 @@ public class AddServiceHandler(
         if (result > 0)
             return result;
 
-        return Error.Failure(description: Resources.ResourceKey.Service.SetFailed);
+        return Errors.ServiceSetFailed();
     }
 }

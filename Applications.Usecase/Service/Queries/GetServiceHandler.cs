@@ -13,7 +13,7 @@ public class GetServiceHandler(
         var opt = FindOptions<domain.Service>.ReportOptions();
         var result = await repository.GetAsync(request.ID, findOptions: opt, token: cancellationToken);
         if (result is null)
-            return Error.NotFound(description: Resources.ResourceKey.Service.NotFound);
+            return Errors.ServiceNotFound();
 
         return result;
     }

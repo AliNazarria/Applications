@@ -15,7 +15,7 @@ public class GetApplicationHandler(
         var option = FindOptions<domain.Application>.ReportOptions();
         var result = await repository.GetAsync(request.ID, findOptions: option, token: cancellationToken);
         if (result is null)
-            return Error.NotFound(description: Resources.ResourceKey.Application.NotFound);
+            return Errors.ApplicationNotFound();
 
         return result;
     }
