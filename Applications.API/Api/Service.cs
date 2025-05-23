@@ -1,18 +1,18 @@
-﻿using Applications.API.Common;
-using Applications.API.Util;
-using Applications.Usecase.Common.Models;
+﻿using Applications.API.Util;
 using Applications.Usecase.Service.Commands;
 using Applications.Usecase.Service.Queries;
 using Asp.Versioning.Builder;
+using Common.API;
+using Common.Usecase.Models;
 using ErrorOr;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Applications.API.Api;
 
-public static class Service
+public class Service : IEndpoint
 {
-    public static void UseServiceEndpoints(this IEndpointRouteBuilder app, ApiVersionSet apiVersionSet)
+    public void RegisterEndpoints(IEndpointRouteBuilder app, ApiVersionSet apiVersionSet)
     {
         RouteGroupBuilder appActions = app
         .MapGroup($"{ApiResources.ApiBasePath}/v{{version:apiVersion}}/{ApiResources.Services}")
@@ -23,11 +23,12 @@ public static class Service
         appActions.MapPut("/{id:int}", ServiceUpdate);
         appActions.MapPost("/", ServiceAdd);
         appActions.MapPost("/getlist/{page:int}/{size:int}", ServiceReport);
+        appActions.MapGet("/getall", ServiceGetAll);
         appActions.MapGet("/{id:int}", ServiceGet).WithName(RouteNames.ServiceGet.ToString());
         appActions.MapDelete("/{id:int}", ServiceDelete);
     }
 
-    public static async Task<IResult> ServiceGet(
+    private async Task<IResult> ServiceGet(
         [FromRoute] int id,
         CancellationToken token,
         IMediator mediator,
@@ -36,7 +37,7 @@ public static class Service
         var result = await mediator.Send(new GetServiceQuery(id), token);
         return responseHelper.OkResult(result, ToDto);
     }
-    public static async Task<IResult> ServiceReport(
+    private async Task<IResult> ServiceReport(
         [FromBody] ReportFilterDTO? filter,
         [FromRoute] int page,
         [FromRoute] int size,
@@ -47,20 +48,29 @@ public static class Service
         var result = await mediator.Send(new ReportServiceQuery(filter, page, size), token);
         return responseHelper.OkResult(result, ToDto);
     }
-    public static async Task<IResult> ServiceAdd(
-    [FromBody] ServiceInputDTO service,
-    CancellationToken token,
-    IEndpointLinkGenerator linkGenerator,
-    HttpContext context,
-    IMediator mediator,
-    IResponseHelper responseHelper)
+    private async Task<IResult> ServiceGetAll(
+        CancellationToken token,
+        IMediator mediator,
+        IResponseHelper responseHelper)
+    {
+        var result = await mediator.Send(new GetAllServiceQuery(), token);
+        return responseHelper.OkResult(result, ToDto);
+    }
+
+    private async Task<IResult> ServiceAdd(
+        [FromBody] ServiceInputDTO service,
+        CancellationToken token,
+        IEndpointLinkGenerator linkGenerator,
+        HttpContext context,
+        IMediator mediator,
+        IResponseHelper responseHelper)
     {
         ErrorOr<int> result = await mediator.Send(new AddServiceCommand(
               service.Key, service.Name, service.Active), token);
-        var location = linkGenerator.Url(context, RouteNames.ServiceGet, new { id = result.Value });
+        var location = linkGenerator.PathByName(context, RouteNames.ServiceGet.ToString(), new { id = result.Value });
         return responseHelper.CreatedResult(result, () => { return result.Value; }, location);
     }
-    public static async Task<IResult> ServiceUpdate(
+    private async Task<IResult> ServiceUpdate(
         [FromBody] ServiceInputDTO service,
         [FromRoute] int id,
         CancellationToken token,
@@ -71,10 +81,10 @@ public static class Service
     {
         ErrorOr<int> result = await mediator.Send(new UpdateServiceCommand(
              id, service.Key, service.Name, service.Active), token);
-        var location = linkGenerator.Url(context, RouteNames.ServiceGet, new { id = result.Value });
+        var location = linkGenerator.PathByName(context, RouteNames.ServiceGet.ToString(), new { id = result.Value });
         return responseHelper.CreatedResult(result, () => { return result.Value; }, location);
     }
-    public static async Task<IResult> ServiceDelete(
+    private async Task<IResult> ServiceDelete(
         [FromRoute] int id,
         CancellationToken token,
         IEndpointLinkGenerator linkGenerator,
@@ -83,7 +93,7 @@ public static class Service
         IResponseHelper responseHelper)
     {
         var result = await mediator.Send(new DeleteServiceCommand(id), token);
-        var location = linkGenerator.Url(context, RouteNames.ServiceDeletedGet, new { id = result.Value });
+        var location = linkGenerator.PathByName(context, RouteNames.ServiceDeletedGet.ToString(), new { id = result.Value });
         return responseHelper.CreatedResult(result, () => { return result.Value; }, location);
     }
     private static ServiceParamDTO ToDto(Domain.Service.Service service) =>
@@ -96,6 +106,8 @@ public static class Service
             Updated_At = service.Updated_At,
             Updated_By = service.Updated_By,
         };
+    private static List<ServiceParamDTO> ToDto(List<Domain.Service.Service> service) =>
+        service.ConvertAll(ToDto);
     private static PaginatedListDTO<ServiceParamDTO> ToDto(PaginatedListDTO<Domain.Service.Service> service) =>
         new PaginatedListDTO<ServiceParamDTO>(service.Items.ConvertAll(ToDto), service.TotalCount, service.PageNumber, service.Items.Count);
 }

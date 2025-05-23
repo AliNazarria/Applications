@@ -1,8 +1,9 @@
-﻿using Applications.Domain.Common.ValueObjects;
-using Applications.Domain.Service.Events;
-using SharedKernel;
+﻿using Applications.Domain.Service.Events;
+using Common.Domain;
 using System.Diagnostics;
 using ErrorOr;
+using Applications.Domain.Service.ValueObjects;
+using Common.Domain.ValueObjects;
 
 namespace Applications.Domain.Service;
 
@@ -23,7 +24,7 @@ public class Service : Entity<int>
         this.Name = new NameValueObject(name);
         if (active)
             this.Activated();
-        this.Create(userId, createDate);
+        this.Create(createDate, userId);
         RegisterDomainEvent(new ServiceAddEvent(this));
     }
 
@@ -37,14 +38,14 @@ public class Service : Entity<int>
         this.Name = new NameValueObject(name);
         if (!active)
             this.Deactive();
-        this.Update(userId, updateDate);
+        this.Update(updateDate, userId);
         RegisterDomainEvent(new ServiceUpdateEvent(this));
         return Result.Success;
     }
     public ErrorOr<Success> Delete(Guid user, int deleteDate)
     {
         this.SoftDelete();
-        this.Update(user, deleteDate);
+        this.Update(deleteDate, user);
         RegisterDomainEvent(new ServiceDeleteEvent(this));
         return Result.Success;
     }

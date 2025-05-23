@@ -1,6 +1,4 @@
 ﻿using Applications.Domain.Service.Events;
-using Applications.Usecase.Common.Interfaces;
-using MediatR;
 
 namespace Applications.Usecase.Service.Events;
 

@@ -1,15 +1,11 @@
-﻿using Applications.Usecase.Common.Interfaces;
-using Applications.Usecase.Common.Security;
-using ErrorOr;
-using FluentValidation;
-using domain = Applications.Domain.Service;
+﻿using FluentValidation;
 
 
 namespace Applications.Usecase.Service.Queries;
 
 [Authorize(Permissions = Permissions.Service.Get, Policies = Policy.Guest, Roles = "")]
 public record GetServiceQuery(int ID)
-    : IAuthorizeableRequest<ErrorOr<domain.Service>>
+    : IAuthorizeableRequest<ErrorOr<serviceDomain.Service>>
 {
 }
 
@@ -18,8 +14,6 @@ public class GetServiceQueryValidator
 {
     public GetServiceQueryValidator()
     {
-        RuleFor(x => x.ID)
-            .GreaterThan(0)
-            .WithMessage(Resources.ResourceKey.IdInvalid);
+        RuleFor(x => x.ID).ServiceId();
     }
 }

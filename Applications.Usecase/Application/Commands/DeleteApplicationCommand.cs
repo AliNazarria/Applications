@@ -1,13 +1,10 @@
-﻿using Applications.Usecase.Common.Security;
-using ErrorOr;
-using FluentValidation;
-using MediatR;
+﻿using FluentValidation;
 
 namespace Applications.Usecase.Application.Commands;
 
 [Authorize(Permissions = Permissions.Application.Delete, Policies = Policy.Admin, Roles = Roles.Admin)]
 public record DeleteApplicationCommand(int ID)
-    : IRequest<ErrorOr<int>>
+    : IAuthorizeableRequest<ErrorOr<int>>
 {
 }
 
@@ -16,8 +13,6 @@ public class DeleteApplicationCommandValidator :
 {
     public DeleteApplicationCommandValidator()
     {
-        RuleFor(x => x.ID)
-            .GreaterThan(0)
-            .WithMessage(Resources.ResourceKey.IdInvalid);
+        RuleFor(x => x.ID).ApplicationId();
     }
 }

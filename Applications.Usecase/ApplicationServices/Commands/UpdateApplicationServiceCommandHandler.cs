@@ -1,11 +1,7 @@
-﻿using Applications.Usecase.Common;
-using Applications.Usecase.Common.Interfaces;
-using domain = Applications.Domain.Application;
-
-namespace Applications.Usecase.ApplicationServices.Commands;
+﻿namespace Applications.Usecase.ApplicationServices.Commands;
 
 public class UpdateApplicationServiceCommandHandler(
-    [FromKeyedServices(Constants.Proxy)] IGenericRepository<domain.ApplicationService, int> repository,
+    [FromKeyedServices(Constants.Proxy)] IGenericRepository<appDomain.ApplicationService, int> repository,
     IUserContextProvider userContext,
     IDateTimeProvider dateTimeProvider
     )
@@ -15,11 +11,11 @@ public class UpdateApplicationServiceCommandHandler(
     {
         var applicationService = await repository.GetAsync(request.ID, token: cancellationToken);
         if (applicationService is null)
-            return domain.Errors.ApplicationServiceNotFound();
+            return appDomain.Errors.ApplicationServiceNotFound();
 
-        var appResult = applicationService.Update(request.application,
-            request.service,
-            request.active,
+        var appResult = applicationService.Update(request.ApplicationID,
+            request.ServiceID,
+            request.Active,
             userContext.UserID,
             dateTimeProvider.NowTimeStampInSecound());
         if (appResult.IsError)
@@ -29,6 +25,6 @@ public class UpdateApplicationServiceCommandHandler(
         if (result > 0)
             return result;
 
-        return Errors.ApplicationServiceSetFailed();
+        return ApplicationServiceErrors.ApplicationServiceSetFailed();
     }
 }

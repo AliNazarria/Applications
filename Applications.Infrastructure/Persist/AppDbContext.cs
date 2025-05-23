@@ -1,6 +1,6 @@
-﻿using Applications.Usecase.Common.Interfaces;
+﻿using Common.Domain;
+using Common.Usecase.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using SharedKernel;
 using System.Reflection;
 
 namespace Applications.Infrastructure.Persist;
@@ -14,8 +14,8 @@ public class AppDbContext : DbContext
     {
         _dispatcher = dispatcher;
     }
-    public DbSet<Domain.Application.Application> Applications => Set<Domain.Application.Application>();
-    public DbSet<Domain.Application.ApplicationService> ApplicationServices => Set<Domain.Application.ApplicationService>();
+    public DbSet<Common.Domain.Entities.Application> Applications => Set<Common.Domain.Entities.Application>();
+    public DbSet<Common.Domain.Entities.ApplicationService> ApplicationServices => Set<Common.Domain.Entities.ApplicationService>();
     public DbSet<Domain.Service.Service> Services => Set<Domain.Service.Service>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

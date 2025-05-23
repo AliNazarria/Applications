@@ -1,7 +1,4 @@
-﻿using Applications.Usecase.Common.Interfaces;
-using Applications.Usecase.Common.Security;
-using Applications.Usecase.Service.Interfaces;
-using FluentValidation;
+﻿using FluentValidation;
 
 namespace Applications.Usecase.Service.Commands;
 
@@ -17,20 +14,9 @@ public record UpdateServiceCommand(
 public class UpdateServiceCommandValidator
     : AbstractValidator<UpdateServiceCommand>
 {
-    public UpdateServiceCommandValidator(
-        IServiceRepository serviceRepository
-       )
+    public UpdateServiceCommandValidator()
     {
-        RuleFor(x => x.Name)
-            .NotNull().NotEmpty()
-            .WithMessage(Resources.ResourceKey.NameInvalid);
-
-        //RuleFor(x => x.Key)
-        //    .NotNull().NotEmpty()
-        //    .WithMessage(Resources.ResourceKey.KeyInvalid);
-        //RuleFor(x => x).MustAsync(async (command, token) =>
-        //{
-        //    return await serviceRepository.IsUnique(0, command.Key);
-        //}).WithMessage(Resources.ResourceKey.KeyIsDuplicated);
+        RuleFor(x => x.ID).ServiceId();
+        RuleFor(x => x.Name).ServiceName();
     }
 }

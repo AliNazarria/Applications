@@ -1,13 +1,12 @@
-﻿using Applications.Infrastructure.Common;
-using Applications.Infrastructure.Persist;
+﻿using Applications.Infrastructure.Persist;
 using Applications.Infrastructure.Persist.Repository;
 using Applications.Usecase;
-using Applications.Usecase.Application.Interfaces;
-using Applications.Usecase.Common.Interfaces;
-using Applications.Usecase.Service.Interfaces;
+using Common.Infrastructure;
+using Common.Usecase.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -18,19 +17,28 @@ public static class Injection
     public static IServiceCollection RegisterInfrastructure(this IServiceCollection services, IConfiguration configuration, bool isDevelopment)
     {
         services
-            .RegisterCommonServices(isDevelopment)
+            .RegisterCommonInfraServices(configuration, isDevelopment)
+            .RegisterLocalApplicationRepository()
             .RegisterPersist(configuration)
             .RegisterUsecase(isDevelopment);
 
+        services.AddHybridCache(options =>
+        {
+            options.MaximumPayloadBytes = 1024 * 1024;
+            options.MaximumKeyLength = 1024;
+            options.DefaultEntryOptions = new HybridCacheEntryOptions
+            {
+                Expiration = TimeSpan.FromMinutes(60),
+                LocalCacheExpiration = TimeSpan.FromMinutes(60)
+            };
+        });
         return services;
     }
-    private static IServiceCollection RegisterCommonServices(this IServiceCollection services, bool isDevelopment)
-    {
-        services.AddSingleton<IDateTimeProvider, SystemDateTimeProvider>();
-        services.AddScoped<IUserContextProvider, UserContextProvider>();
-        services.AddScoped<IAuthorizationServiceProvider, AuthorizationServiceProvider>();
-        services.AddScoped<ILoggerServiceProvider, LoggerServiceProvider>();
 
+    private static IServiceCollection RegisterLocalApplicationRepository(this IServiceCollection services)
+    {
+        services.AddKeyedScoped(typeof(IApplicationRepository), Common.Usecase.Constants.Real, typeof(LocalApplicationRepository));
+        services.AddKeyedScoped(typeof(IApplicationRepository), Common.Usecase.Constants.Cached, typeof(LocalApplicationRepositoryCacheProxy));
         return services;
     }
     private static IServiceCollection RegisterPersist(this IServiceCollection services, IConfiguration configuration)
@@ -40,9 +48,7 @@ public static class Injection
         {
             options.UseSqlServer(connectionString);
         });
-        services.AddKeyedScoped(typeof(IGenericRepository<,>), "real", typeof(GenericRepository<,>));
-        services.AddScoped<IApplicationRepository, ApplicationRepository>();
-        services.AddScoped<IServiceRepository, ServiceRepository>();
+        services.AddKeyedScoped(typeof(IGenericRepository<,>), Common.Usecase.Constants.Real, typeof(GenericRepository<,>));
 
         return services;
     }

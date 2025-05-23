@@ -13,8 +13,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Applications.Infrastructure
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Applications.Migration", "Applications.Migration\Applications.Migration.csproj", "{5EDED4CE-97F3-44B4-8C13-B1615E182B63}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharedKernel", "SharedKernel\SharedKernel.csproj", "{E68FA0BA-F0A4-F704-5156-C748B031AB9D}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,10 +39,6 @@ Global
 		{5EDED4CE-97F3-44B4-8C13-B1615E182B63}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5EDED4CE-97F3-44B4-8C13-B1615E182B63}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5EDED4CE-97F3-44B4-8C13-B1615E182B63}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E68FA0BA-F0A4-F704-5156-C748B031AB9D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E68FA0BA-F0A4-F704-5156-C748B031AB9D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E68FA0BA-F0A4-F704-5156-C748B031AB9D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E68FA0BA-F0A4-F704-5156-C748B031AB9D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

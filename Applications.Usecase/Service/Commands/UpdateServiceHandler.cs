@@ -1,11 +1,7 @@
-﻿using Applications.Usecase.Common;
-using Applications.Usecase.Common.Interfaces;
-using domain = Applications.Domain.Service;
-
-namespace Applications.Usecase.Service.Commands;
+﻿namespace Applications.Usecase.Service.Commands;
 
 public class UpdateServiceHandler(
-    [FromKeyedServices(Constants.Proxy)] IGenericRepository<domain.Service, int> repository,
+    [FromKeyedServices(Constants.Proxy)] IGenericRepository<serviceDomain.Service, int> repository,
     IUserContextProvider userContext,
     IDateTimeProvider dateTimeProvider)
     : IRequestHandler<UpdateServiceCommand, ErrorOr<int>>
@@ -15,7 +11,7 @@ public class UpdateServiceHandler(
     {
         var service = await repository.GetAsync(request.ID);
         if (service is null)
-            return Errors.ServiceNotFound();
+            return ServiceErrors.ServiceNotFound();
 
         service.Update(request.Key,
             request.Name,
@@ -27,6 +23,6 @@ public class UpdateServiceHandler(
         if (result > 0)
             return result;
 
-        return Errors.ServiceSetFailed();
+        return ServiceErrors.ServiceSetFailed();
     }
 }

@@ -1,10 +1,10 @@
-﻿using Applications.Infrastructure.Common;
-using Applications.Usecase.Common.Interfaces;
-using Applications.Usecase.Common.Models;
+﻿using Common.Domain;
+using Common.Usecase.Interfaces;
+using Common.Usecase.Models;
 using Microsoft.EntityFrameworkCore;
-using SharedKernel;
 using System.ComponentModel;
 using System.Linq.Expressions;
+using Common.Infrastructure;
 
 namespace Applications.Infrastructure.Persist.Repository;
 
@@ -72,17 +72,18 @@ public class GenericRepository<TEntity, TID>
         return await dbContext.Set<TEntity>().CountAsync(predicate) != 0;
     }
     public async Task<TEntity> FirstAsync(Expression<Func<TEntity, bool>> predicate
+        , FindOptions<TEntity>? findOptions = null
         , CancellationToken token = default)
     {
         ArgumentNullException.ThrowIfNull(predicate);
-        return await dbContext.Set<TEntity>().FirstOrDefaultAsync(predicate);
+        return await Get(findOptions).FirstOrDefaultAsync(predicate);
     }
 
-    public async Task<TID> InsertAsync(TEntity entity)
+    public async Task<TEntity> InsertAsync(TEntity entity)
     {
         dbContext.Set<TEntity>().Add(entity);
         var result = await dbContext.SaveChangesAsync();
-        return entity.ID;
+        return result > 0 ? entity : null;
     }
     public async Task<bool> InsertRangeAsync(IEnumerable<TEntity> entities)
     {
@@ -92,6 +93,7 @@ public class GenericRepository<TEntity, TID>
     }
     public async Task<TID> UpdateAsync(TEntity entity)
     {
+        dbContext.Set<TEntity>().Attach(entity);
         dbContext.Entry(entity).State = EntityState.Modified;
         var result = await dbContext.SaveChangesAsync();
         return entity.ID;

@@ -1,6 +1,4 @@
-﻿using Applications.Domain.Application.Events;
-using Applications.Usecase.Common.Interfaces;
-using MediatR;
+﻿using Common.Domain.Entities.Events;
 
 namespace Applications.Usecase.ApplicationServices.Events;
 

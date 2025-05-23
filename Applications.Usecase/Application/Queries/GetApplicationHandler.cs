@@ -1,21 +1,17 @@
-﻿using Applications.Usecase.Common;
-using Applications.Usecase.Common.Interfaces;
-using domain = Applications.Domain.Application;
-
-namespace Applications.Usecase.Application.Queries;
+﻿namespace Applications.Usecase.Application.Queries;
 
 public class GetApplicationHandler(
-    [FromKeyedServices(Constants.Proxy)] IGenericRepository<domain.Application, int> repository
+    [FromKeyedServices(Constants.Proxy)] IGenericRepository<appDomain.Application, int> repository
     )
-    : IRequestHandler<GetApplicationQuery, ErrorOr<domain.Application>>
+    : IRequestHandler<GetApplicationQuery, ErrorOr<appDomain.Application>>
 {
-    async Task<ErrorOr<domain.Application>> IRequestHandler<GetApplicationQuery, ErrorOr<domain.Application>>.Handle(
+    async Task<ErrorOr<appDomain.Application>> IRequestHandler<GetApplicationQuery, ErrorOr<appDomain.Application>>.Handle(
         GetApplicationQuery request, CancellationToken cancellationToken)
     {
-        var option = FindOptions<domain.Application>.ReportOptions();
+        var option = FindOptions<appDomain.Application>.ReportOptions();
         var result = await repository.GetAsync(request.ID, findOptions: option, token: cancellationToken);
         if (result is null)
-            return Errors.ApplicationNotFound();
+            return ApplicationErrors.ApplicationNotFound();
 
         return result;
     }

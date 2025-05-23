@@ -1,25 +1,20 @@
-﻿using Applications.Usecase.Common;
-using Applications.Usecase.Common.Interfaces;
-using Applications.Usecase.Common.Models;
-using domain = Applications.Domain.Application;
-
-namespace Applications.Usecase.Application.Queries;
+﻿namespace Applications.Usecase.Application.Queries;
 
 public class ReportApplicationHandler(
-    [FromKeyedServices(Constants.Proxy)] IGenericRepository<domain.Application, int> repository
+    [FromKeyedServices(Constants.Proxy)] IGenericRepository<appDomain.Application, int> repository
     ) :
-    IRequestHandler<ReportApplicationQuery, ErrorOr<PaginatedListDTO<domain.Application>>>
+    IRequestHandler<ReportApplicationQuery, ErrorOr<PaginatedListDTO<appDomain.Application>>>
 {
-    public async Task<ErrorOr<PaginatedListDTO<domain.Application>>> Handle(
+    public async Task<ErrorOr<PaginatedListDTO<appDomain.Application>>> Handle(
         ReportApplicationQuery request, CancellationToken cancellationToken)
     {
-        var predicateResult = PredicateBuilder.MakePredicate<domain.Application>(request.Filter.Filter);
+        var predicateResult = PredicateBuilder.MakePredicate<appDomain.Application>(request.Filter?.Filter);
         if (predicateResult.IsError)
             return predicateResult.Errors;
 
-        var options = FindOptions<domain.Application>.ReportOptions();
+        var options = FindOptions<appDomain.Application>.ReportOptions();
         var result = await repository.GetPagedAsync(predicateResult.Value
-            , request.Filter.OrderBy
+            , request.Filter?.OrderBy
             , request.Page
             , request.Size
             , findOptions: options

@@ -1,8 +1,4 @@
-﻿using Applications.Usecase.Application.Interfaces;
-using Applications.Usecase.Common.Interfaces;
-using Applications.Usecase.Common.Security;
-using ErrorOr;
-using FluentValidation;
+﻿using FluentValidation;
 
 namespace Applications.Usecase.Application.Commands;
 
@@ -21,24 +17,9 @@ public record UpdateApplicationCommand(
 public class UpdateApplicationCommandValidator
     : AbstractValidator<UpdateApplicationCommand>
 {
-    public UpdateApplicationCommandValidator(
-        IApplicationRepository applicationRepository
-        )
+    public UpdateApplicationCommandValidator()
     {
-        RuleFor(x => x.ID)
-            .GreaterThan(0)
-            .WithMessage(Resources.ResourceKey.IdInvalid);
-
-        RuleFor(x => x.Title)
-            .NotNull().NotEmpty()
-            .WithMessage(Resources.ResourceKey.TitleInvalid);
-
-        //RuleFor(x => x.Key)
-        //    .NotNull().NotEmpty()
-        //    .WithMessage(Resources.ResourceKey.KeyInvalid);
-        //RuleFor(x => x).MustAsync(async (command, token) =>
-        //{
-        //    return await applicationRepository.IsUnique(command.ID, command.Key);
-        //}).WithMessage(Resources.ResourceKey.KeyIsDuplicated);
+        RuleFor(x => x.ID).ApplicationId();
+        RuleFor(x => x.Title).Title();
     }
 }

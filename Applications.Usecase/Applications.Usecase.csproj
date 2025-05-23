@@ -8,14 +8,19 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Applications.Domain\Applications.Domain.csproj" />
-    <ProjectReference Include="..\SharedKernel\SharedKernel.csproj" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Common.Usecase" Version="1.0.11" />
     <PackageReference Include="ErrorOr" Version="2.0.1" />
     <PackageReference Include="FluentValidation" Version="11.11.0" />
     <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
     <PackageReference Include="MediatR" Version="12.4.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Application\Interfaces\" />
+    <Folder Include="Service\Interfaces\" />
   </ItemGroup>
 
 </Project>

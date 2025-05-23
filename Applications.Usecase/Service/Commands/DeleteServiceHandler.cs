@@ -1,11 +1,7 @@
-﻿using Applications.Usecase.Common;
-using Applications.Usecase.Common.Interfaces;
-using domain = Applications.Domain.Service;
-
-namespace Applications.Usecase.Service.Commands;
+﻿namespace Applications.Usecase.Service.Commands;
 
 public class DeleteServiceHandler(
-    [FromKeyedServices(Constants.Proxy)] IGenericRepository<domain.Service, int> repository,
+    [FromKeyedServices(Constants.Proxy)] IGenericRepository<serviceDomain.Service, int> repository,
     IDateTimeProvider dateTimeProvider,
     IUserContextProvider userContext)
     : IRequestHandler<DeleteServiceCommand, ErrorOr<int>>
@@ -15,7 +11,7 @@ public class DeleteServiceHandler(
     {
         var service = await repository.GetAsync(request.ID);
         if (service is null)
-            return Errors.ServiceNotFound();
+            return ServiceErrors.ServiceNotFound();
 
         service.Delete(userContext.UserID, dateTimeProvider.NowTimeStampInSecound());
 
@@ -23,6 +19,6 @@ public class DeleteServiceHandler(
         if (result > 0)
             return result;
 
-        return Errors.ServiceDeletedFailed();
+        return ServiceErrors.ServiceDeletedFailed();
     }
 }

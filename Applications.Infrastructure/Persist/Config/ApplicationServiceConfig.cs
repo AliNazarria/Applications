@@ -1,14 +1,13 @@
-﻿using Applications.Domain.Application;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Applications.Infrastructure.Persist.Config;
 
-public class ApplicationServiceConfig : IEntityTypeConfiguration<ApplicationService>
+public class ApplicationServiceConfig : IEntityTypeConfiguration<Common.Domain.Entities.ApplicationService>
 {
-    public void Configure(EntityTypeBuilder<ApplicationService> builder)
+    public void Configure(EntityTypeBuilder<Common.Domain.Entities.ApplicationService> builder)
     {
-        builder.ToTable($"{nameof(ApplicationService)}", schema: DataSchemaConstants.DEFAULT_SCHEMA_NAME);
+        builder.ToTable($"{nameof(Common.Domain.Entities.ApplicationService)}", schema: DataSchemaConstants.DEFAULT_SCHEMA_NAME);
         builder.Property(p => p.ID).IsRequired()
           .UseIdentityColumn().ValueGeneratedOnAdd();
 

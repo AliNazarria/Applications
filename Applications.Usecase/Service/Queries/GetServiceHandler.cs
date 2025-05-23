@@ -1,19 +1,15 @@
-﻿using Applications.Usecase.Common;
-using Applications.Usecase.Common.Interfaces;
-using domain = Applications.Domain.Service;
-
-namespace Applications.Usecase.Service.Queries;
+﻿namespace Applications.Usecase.Service.Queries;
 
 public class GetServiceHandler(
-    [FromKeyedServices(Constants.Proxy)] IGenericRepository<domain.Service, int> repository
-    ) : IRequestHandler<GetServiceQuery, ErrorOr<domain.Service>>
+    [FromKeyedServices(Constants.Proxy)] IGenericRepository<serviceDomain.Service, int> repository
+    ) : IRequestHandler<GetServiceQuery, ErrorOr<serviceDomain.Service>>
 {
-    public async Task<ErrorOr<domain.Service>> Handle(GetServiceQuery request, CancellationToken cancellationToken)
+    public async Task<ErrorOr<serviceDomain.Service>> Handle(GetServiceQuery request, CancellationToken cancellationToken)
     {
-        var opt = FindOptions<domain.Service>.ReportOptions();
+        var opt = FindOptions<serviceDomain.Service>.ReportOptions();
         var result = await repository.GetAsync(request.ID, findOptions: opt, token: cancellationToken);
         if (result is null)
-            return Errors.ServiceNotFound();
+            return ServiceErrors.ServiceNotFound();
 
         return result;
     }

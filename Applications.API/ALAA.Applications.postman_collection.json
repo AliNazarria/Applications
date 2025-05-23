@@ -1,0 +1,610 @@
+{
+	"info": {
+		"_postman_id": "d94fc8db-4f6f-4771-abc2-19ed89ddd452",
+		"name": "ALAA.Applications",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "3853087"
+	},
+	"item": [
+		{
+			"name": "ApplicationReport",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "AppID",
+						"value": "1",
+						"type": "text"
+					},
+					{
+						"key": "ServiceID",
+						"value": "1",
+						"type": "text"
+					},
+					{
+						"key": "UserID",
+						"value": "9C688B44-52F3-4258-B95E-EEA17E269088",
+						"type": "text"
+					},
+					{
+						"key": "Language",
+						"value": "fa",
+						"type": "text"
+					},
+					{
+						"key": "CorrelationId",
+						"value": "1",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"filter\": [\r\n    {\r\n      \"key\": \"id\",\r\n      \"value\": \"0\",\r\n      \"operation\": \"Greater\"\r\n    }\r\n  ],\r\n  \"orderBy\": \"id asc\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{Local}}/api/application/v1/applications/getlist/1/100"
+			},
+			"response": []
+		},
+		{
+			"name": "ApplicationGet",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "AppID",
+						"value": "1",
+						"type": "text"
+					},
+					{
+						"key": "ServiceID",
+						"value": "1",
+						"type": "text"
+					},
+					{
+						"key": "UserID",
+						"value": "9C688B44-52F3-4258-B95E-EEA17E269088",
+						"type": "text"
+					},
+					{
+						"key": "Language",
+						"value": "fa",
+						"type": "text"
+					},
+					{
+						"key": "CorrelationId",
+						"value": "1",
+						"type": "text"
+					}
+				],
+				"url": "{{Local}}/api/application/v1/applications/1"
+			},
+			"response": []
+		},
+		{
+			"name": "ApplicationUpdate",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "AppID",
+						"value": "1",
+						"type": "text"
+					},
+					{
+						"key": "ServiceID",
+						"value": "1",
+						"type": "text"
+					},
+					{
+						"key": "UserID",
+						"value": "9C688B44-52F3-4258-B95E-EEA17E269088",
+						"type": "text"
+					},
+					{
+						"key": "Language",
+						"value": "fa",
+						"type": "text"
+					},
+					{
+						"key": "CorrelationId",
+						"value": "1",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"key\": \"Sagheb\",\r\n    \"title\": \"ثاقب\",\r\n    \"comment\": \"برگزاری جلسات روضه\",\r\n    \"logoAddress\": \"/folder/1\",\r\n    \"active\": true\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{Local}}/api/application/v1/applications/1"
+			},
+			"response": []
+		},
+		{
+			"name": "ApplicationAdd",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "AppID",
+						"value": "1",
+						"type": "text"
+					},
+					{
+						"key": "ServiceID",
+						"value": "1",
+						"type": "text"
+					},
+					{
+						"key": "UserID",
+						"value": "9C688B44-52F3-4258-B95E-EEA17E269088",
+						"type": "text"
+					},
+					{
+						"key": "Language",
+						"value": "fa",
+						"type": "text"
+					},
+					{
+						"key": "CorrelationId",
+						"value": "1",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"active\": false,\r\n  \"key\": \"tafsir\",\r\n  \"title\": \"تفسیر\",\r\n  \"comment\": \"string\",\r\n  \"logoAddress\": \"string\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{Local}}/api/application/v1/applications"
+			},
+			"response": []
+		},
+		{
+			"name": "ApplicationDelete",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "AppID",
+						"value": "1",
+						"type": "text"
+					},
+					{
+						"key": "ServiceID",
+						"value": "1",
+						"type": "text"
+					},
+					{
+						"key": "UserID",
+						"value": "9C688B44-52F3-4258-B95E-EEA17E269088",
+						"type": "text"
+					},
+					{
+						"key": "Language",
+						"value": "fa",
+						"type": "text"
+					},
+					{
+						"key": "CorrelationId",
+						"value": "1",
+						"type": "text"
+					}
+				],
+				"url": "{{Local}}/api/application/v1/applications/32"
+			},
+			"response": []
+		},
+		{
+			"name": "ServiceReport",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "AppID",
+						"value": "1",
+						"type": "text"
+					},
+					{
+						"key": "ServiceID",
+						"value": "1",
+						"type": "text"
+					},
+					{
+						"key": "UserID",
+						"value": "9C688B44-52F3-4258-B95E-EEA17E269088",
+						"type": "text"
+					},
+					{
+						"key": "Language",
+						"value": "fa",
+						"type": "text"
+					},
+					{
+						"key": "CorrelationId",
+						"value": "1",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"filter\": [\r\n    {\r\n      \"key\": \"id\",\r\n      \"value\": \"0\",\r\n      \"operation\": \"Greater\"\r\n    }\r\n  ],\r\n  \"orderBy\": \"id asc\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{Local}}/api/application/v1/services/getlist/1/100"
+			},
+			"response": []
+		},
+		{
+			"name": "ServiceGet",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "AppID",
+						"value": "1",
+						"type": "text"
+					},
+					{
+						"key": "ServiceID",
+						"value": "1",
+						"type": "text"
+					},
+					{
+						"key": "UserID",
+						"value": "9C688B44-52F3-4258-B95E-EEA17E269088",
+						"type": "text"
+					},
+					{
+						"key": "Language",
+						"value": "fa",
+						"type": "text"
+					},
+					{
+						"key": "CorrelationId",
+						"value": "1",
+						"type": "text"
+					}
+				],
+				"url": "{{Local}}/api/application/v1/services/1"
+			},
+			"response": []
+		},
+		{
+			"name": "ServiceUpdate",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "AppID",
+						"value": "1",
+						"type": "text"
+					},
+					{
+						"key": "ServiceID",
+						"value": "1",
+						"type": "text"
+					},
+					{
+						"key": "UserID",
+						"value": "9C688B44-52F3-4258-B95E-EEA17E269088",
+						"type": "text"
+					},
+					{
+						"key": "Language",
+						"value": "fa",
+						"type": "text"
+					},
+					{
+						"key": "CorrelationId",
+						"value": "1",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"active\": false,\r\n  \"key\": \"new\",\r\n  \"name\": \"سرویس جدید\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{Local}}/api/application/v1/services/5"
+			},
+			"response": []
+		},
+		{
+			"name": "ServiceAdd",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "AppID",
+						"value": "1",
+						"type": "text"
+					},
+					{
+						"key": "ServiceID",
+						"value": "1",
+						"type": "text"
+					},
+					{
+						"key": "UserID",
+						"value": "9C688B44-52F3-4258-B95E-EEA17E269088",
+						"type": "text"
+					},
+					{
+						"key": "Language",
+						"value": "fa",
+						"type": "text"
+					},
+					{
+						"key": "CorrelationId",
+						"value": "1",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"active\": false,\r\n  \"key\": \"\",\r\n  \"name\": \"سرویس جدید\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{Local}}/api/application/v1/services"
+			},
+			"response": []
+		},
+		{
+			"name": "ServiceDelete",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "AppID",
+						"value": "1",
+						"type": "text"
+					},
+					{
+						"key": "ServiceID",
+						"value": "1",
+						"type": "text"
+					},
+					{
+						"key": "UserID",
+						"value": "9C688B44-52F3-4258-B95E-EEA17E269088",
+						"type": "text"
+					},
+					{
+						"key": "Language",
+						"value": "fa",
+						"type": "text"
+					},
+					{
+						"key": "CorrelationId",
+						"value": "1",
+						"type": "text"
+					}
+				],
+				"url": "{{Local}}/api/application/v1/services/6"
+			},
+			"response": []
+		},
+		{
+			"name": "ApplicationServiceReport",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "AppID",
+						"value": "1",
+						"type": "text"
+					},
+					{
+						"key": "ServiceID",
+						"value": "1",
+						"type": "text"
+					},
+					{
+						"key": "UserID",
+						"value": "9C688B44-52F3-4258-B95E-EEA17E269088",
+						"type": "text"
+					},
+					{
+						"key": "Language",
+						"value": "fa",
+						"type": "text"
+					},
+					{
+						"key": "CorrelationId",
+						"value": "1",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"filter\": [\r\n    {\r\n      \"key\": \"id\",\r\n      \"value\": \"0\",\r\n      \"operation\": \"Greater\"\r\n    }\r\n  ],\r\n  \"orderBy\": \"id asc\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{Local}}/api/application/v1/applicationservices/getlist/1/100"
+			},
+			"response": []
+		},
+		{
+			"name": "ApplicationServiceUpdate",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "AppID",
+						"value": "1",
+						"type": "text"
+					},
+					{
+						"key": "ServiceID",
+						"value": "1",
+						"type": "text"
+					},
+					{
+						"key": "UserID",
+						"value": "9C688B44-52F3-4258-B95E-EEA17E269088",
+						"type": "text"
+					},
+					{
+						"key": "Language",
+						"value": "fa",
+						"type": "text"
+					},
+					{
+						"key": "CorrelationId",
+						"value": "1",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"active\": false,\r\n  \"applicationID\": 1,\r\n  \"serviceID\": 1\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{Local}}/api/application/v1/applicationservices/4"
+			},
+			"response": []
+		},
+		{
+			"name": "ApplicationServiceAdd",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "AppID",
+						"value": "1",
+						"type": "text"
+					},
+					{
+						"key": "ServiceID",
+						"value": "1",
+						"type": "text"
+					},
+					{
+						"key": "UserID",
+						"value": "9C688B44-52F3-4258-B95E-EEA17E269088",
+						"type": "text"
+					},
+					{
+						"key": "Language",
+						"value": "fa",
+						"type": "text"
+					},
+					{
+						"key": "CorrelationId",
+						"value": "1",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"active\": true,\r\n  \"applicationID\": 1,\r\n  \"serviceID\": 1\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{Local}}/api/application/v1/applicationservices"
+			},
+			"response": []
+		},
+		{
+			"name": "ApplicationServiceDelete",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "AppID",
+						"value": "1",
+						"type": "text"
+					},
+					{
+						"key": "ServiceID",
+						"value": "1",
+						"type": "text"
+					},
+					{
+						"key": "UserID",
+						"value": "9C688B44-52F3-4258-B95E-EEA17E269088",
+						"type": "text"
+					},
+					{
+						"key": "Language",
+						"value": "fa",
+						"type": "text"
+					},
+					{
+						"key": "CorrelationId",
+						"value": "1",
+						"type": "text"
+					}
+				],
+				"url": "{{Local}}/api/application/v1/applicationservices/2"
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "Local",
+			"value": "https://localhost:7298",
+			"type": "string"
+		}
+	]
+}

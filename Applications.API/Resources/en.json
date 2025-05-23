@@ -1,21 +1,23 @@
 {
-  "ApplicationDeletedFailed": "Application Deleted Failed",
+  "ApplicationInvalid": "Application Invalid",
+  "FilterInvalid": "Filter Invalid",
+  "UserIDIsRequired": "UserID Is Required",
+  "UserIDInvalid": "UserID Invalid",
+  "PageSizeInvalid": "Page Size Invalid",
+
+  "ApplicationDeleteFailed": "Application Deleted Failed",
   "ApplicationNotFound": "Application Not Found",
-  "ApplicationServiceDeletedFailed": "ApplicationService Deleted Failed",
+  "ApplicationServiceDeleteFailed": "ApplicationService Deleted Failed",
   "ApplicationServiceNotFound": "ApplicationService Not Found",
   "ApplicationServiceIsDuplicate": "ApplicationService Is Duplicate",
   "ApplicationServiceSetFailed": "ApplicationService Set Failed",
   "ApplicationSetFailed": "Application Set Failed",
-  "FilterInvalid": "Filter Invalid",
   "IdInvalid": "Id Invalid",
   "KeyInvalid": "Key Invalid",
   "KeyIsDuplicated": "Key Is Duplicated",
   "NameInvalid": "Name Invalid",
-  "ServiceDeletedFailed": "Service Deleted Failed",
+  "ServiceDeleteFailed": "Service Deleted Failed",
   "ServiceNotFound": "Service Not Found",
   "ServiceSetFailed": "Service Set Failed",
-  "TitleInvalid": "Title Invalid",
-  "UserIDIsRequired": "UserID Is Required",
-  "UserIDInvalid": "UserID Invalid",
-  "PageSizeInvalid": "Page Size Invalid"
+  "TitleInvalid": "Title Invalid"
 }

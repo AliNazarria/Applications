@@ -1,14 +1,13 @@
-﻿using Applications.Domain.Application;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Applications.Infrastructure.Persist.Config;
 
-public class ApplicationConfig : IEntityTypeConfiguration<Application>
+public class ApplicationConfig : IEntityTypeConfiguration<Common.Domain.Entities.Application>
 {
-    public void Configure(EntityTypeBuilder<Application> builder)
+    public void Configure(EntityTypeBuilder<Common.Domain.Entities.Application> builder)
     {
-        builder.ToTable($"{nameof(Application)}", schema: DataSchemaConstants.DEFAULT_SCHEMA_NAME);
+        builder.ToTable($"{nameof(Common.Domain.Entities.Application)}", schema: DataSchemaConstants.DEFAULT_SCHEMA_NAME);
         builder.Property(p => p.ID).IsRequired()
           .UseIdentityColumn().ValueGeneratedOnAdd();
 
@@ -35,37 +34,11 @@ public class ApplicationConfig : IEntityTypeConfiguration<Application>
 
 
         builder.Navigation(x => x.Services);
-            //.UsePropertyAccessMode(PropertyAccessMode.Property)
-            //.IsRequired(false)
-            //.EnableLazyLoading();
-            //.AutoInclude();
         builder
             .HasMany(e => e.Services)
             .WithOne(e => e.Application)
             .HasForeignKey(e => e.ApplicationID)
             .HasPrincipalKey(e => e.ID)
             .IsRequired(false);
-
-        //builder.OwnsMany(x => x.Services, s => {
-        //    s.ToTable(nameof(ApplicationService), DataSchemaConstants.DEFAULT_SCHEMA_NAME);
-        //    s.ToTable($"{nameof(ApplicationService)}", schema: DataSchemaConstants.DEFAULT_SCHEMA_NAME);
-        //    s.Property(p => p.ID).IsRequired()
-        //      .UseIdentityColumn().ValueGeneratedOnAdd();
-
-        //    s.HasKey(x => x.ID);
-        //    s.Property(x => x.Deleted);
-        //    s.Property(x => x.Active);
-        //    s.Property(x => x.Created_At);
-        //    s.Property(x => x.Created_By);
-        //    s.Property(x => x.Updated_At);
-        //    s.Property(x => x.Updated_By);
-
-        //    s.Property(x => x.ApplicationID);
-        //    s.Property(x => x.ServiceID);
-
-        //    s.HasOne(x => x.Application)
-        //        .WithMany(x => x.Services)
-        //        .HasForeignKey(x => x.ApplicationID);
-        //});
     }
 }

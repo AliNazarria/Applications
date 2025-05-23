@@ -1,27 +1,22 @@
-﻿using Applications.Usecase.Common;
-using Applications.Usecase.Common.Interfaces;
-using Applications.Usecase.Common.Models;
-using domain = Applications.Domain.Service;
-
-namespace Applications.Usecase.Service.Queries;
+﻿namespace Applications.Usecase.Service.Queries;
 
 public class ReportServiceHandler(
-    [FromKeyedServices(Constants.Proxy)] IGenericRepository<domain.Service, int> repository
+    [FromKeyedServices(Constants.Proxy)] IGenericRepository<serviceDomain.Service, int> repository
     )
-    : IRequestHandler<ReportServiceQuery, ErrorOr<PaginatedListDTO<domain.Service>>>
+    : IRequestHandler<ReportServiceQuery, ErrorOr<PaginatedListDTO<serviceDomain.Service>>>
 {
-    public async Task<ErrorOr<PaginatedListDTO<domain.Service>>> Handle(ReportServiceQuery request, CancellationToken cancellationToken)
+    public async Task<ErrorOr<PaginatedListDTO<serviceDomain.Service>>> Handle(ReportServiceQuery request, CancellationToken cancellationToken)
     {
-        var predicateResult = PredicateBuilder.MakePredicate<domain.Service>(request.Filter.Filter);
+        var predicateResult = PredicateBuilder.MakePredicate<serviceDomain.Service>(request.Filter?.Filter);
         if (predicateResult.IsError)
             return predicateResult.Errors;
 
-        var opt = FindOptions<domain.Service>.ReportOptions();
+        var options = FindOptions<serviceDomain.Service>.ReportOptions();
         var result = await repository.GetPagedAsync(predicateResult.Value
-            , request.Filter.OrderBy
+            , request.Filter?.OrderBy
             , request.Page
             , request.Size
-            , findOptions: opt
+            , findOptions: options
             , token: cancellationToken);
         return result;
     }

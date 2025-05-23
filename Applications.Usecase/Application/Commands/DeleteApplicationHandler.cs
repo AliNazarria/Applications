@@ -1,11 +1,7 @@
-﻿using Applications.Usecase.Common;
-using Applications.Usecase.Common.Interfaces;
-using domain = Applications.Domain.Application;
-
-namespace Applications.Usecase.Application.Commands;
+﻿namespace Applications.Usecase.Application.Commands;
 
 public class DeleteApplicationHandler(
-    [FromKeyedServices(Constants.Proxy)] IGenericRepository<domain.Application, int> repository,
+    [FromKeyedServices(Constants.Proxy)] IGenericRepository<appDomain.Application, int> repository,
     IDateTimeProvider dateTimeProvider,
     IUserContextProvider userContext)
     : IRequestHandler<DeleteApplicationCommand, ErrorOr<int>>
@@ -15,7 +11,7 @@ public class DeleteApplicationHandler(
     {
         var app = await repository.GetAsync(request.ID);
         if (app is null)
-            return Errors.ApplicationNotFound();
+            return ApplicationErrors.ApplicationNotFound();
 
         app.Delete(userContext.UserID, dateTimeProvider.NowTimeStampInSecound());
 
@@ -23,6 +19,6 @@ public class DeleteApplicationHandler(
         if (result > 0)
             return result;
 
-        return Errors.ApplicationDeletedFailed();
+        return ApplicationErrors.ApplicationDeletedFailed();
     }
 }

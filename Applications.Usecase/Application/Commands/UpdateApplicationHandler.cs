@@ -1,14 +1,7 @@
-﻿using Applications.Usecase.Common;
-using Applications.Usecase.Common.Interfaces;
-using ErrorOr;
-using MediatR;
-using Microsoft.Extensions.DependencyInjection;
-using domain = Applications.Domain.Application;
-
-namespace Applications.Usecase.Application.Commands;
+﻿namespace Applications.Usecase.Application.Commands;
 
 public class UpdateApplicationHandler(
-    [FromKeyedServices(Constants.Proxy)] IGenericRepository<domain.Application, int> repository,
+    [FromKeyedServices(Constants.Proxy)] IGenericRepository<appDomain.Application, int> repository,
     IUserContextProvider userContext,
     IDateTimeProvider dateTimeProvider)
     : IRequestHandler<UpdateApplicationCommand, ErrorOr<int>>
@@ -18,7 +11,7 @@ public class UpdateApplicationHandler(
     {
         var app = await repository.GetAsync(request.ID);
         if (app is null)
-            return Errors.ApplicationNotFound();
+            return ApplicationErrors.ApplicationNotFound();
 
         app.Update(request.Key,
             request.Title,
@@ -32,6 +25,6 @@ public class UpdateApplicationHandler(
         if (result > 0)
             return result;
 
-        return Errors.ApplicationSetFailed();
+        return ApplicationErrors.ApplicationSetFailed();
     }
 }

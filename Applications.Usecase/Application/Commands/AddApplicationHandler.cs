@@ -1,11 +1,7 @@
-﻿using Applications.Usecase.Common;
-using Applications.Usecase.Common.Interfaces;
-using domain = Applications.Domain.Application;
-
-namespace Applications.Usecase.Application.Commands;
+﻿namespace Applications.Usecase.Application.Commands;
 
 public class AddApplicationHandler(
-    [FromKeyedServices(Constants.Proxy)] IGenericRepository<domain.Application, int> repository,
+    [FromKeyedServices(Constants.Proxy)] IGenericRepository<appDomain.Application, int> repository,
     IUserContextProvider userContext,
     IDateTimeProvider dateTimeProvider)
     : IRequestHandler<AddApplicationCommand, ErrorOr<int>>
@@ -13,7 +9,7 @@ public class AddApplicationHandler(
     async Task<ErrorOr<int>> IRequestHandler<AddApplicationCommand, ErrorOr<int>>.Handle(
         AddApplicationCommand request, CancellationToken cancellationToken)
     {
-        var app = new domain.Application(
+        var app = new appDomain.Application(
             request.Key,
             request.Title,
             request.Active,
@@ -22,9 +18,9 @@ public class AddApplicationHandler(
             request.Comment,
             request.LogoAddress);
         var result = await repository.InsertAsync(app);
-        if (result > 0)
-            return result;
+        if (result is null)
+            return ApplicationErrors.ApplicationSetFailed();
 
-        return Errors.ApplicationSetFailed();
+        return result.ID;
     }
 }

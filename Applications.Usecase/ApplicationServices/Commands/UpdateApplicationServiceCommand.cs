@@ -1,6 +1,5 @@
-﻿using Applications.Usecase.Common.Interfaces;
-using Applications.Usecase.Common.Security;
-using ErrorOr;
+﻿using Applications.Usecase.Application;
+using Applications.Usecase.Service;
 using FluentValidation;
 
 namespace Applications.Usecase.ApplicationServices.Commands;
@@ -8,9 +7,9 @@ namespace Applications.Usecase.ApplicationServices.Commands;
 [Authorize(Permissions = Application.Permissions.Application.Update, Policies = Policy.Admin, Roles = Roles.Admin)]
 public record UpdateApplicationServiceCommand(
     int ID,
-    int application,
-    int service,
-    bool active
+    int ApplicationID,
+    int ServiceID,
+    bool Active
     )
     : IAuthorizeableRequest<ErrorOr<int>>
 {
@@ -21,14 +20,8 @@ public class UpdateApplicationServiceCommandValidator :
 {
     public UpdateApplicationServiceCommandValidator()
     {
-        RuleFor(x => x.ID)
-            .GreaterThan(0)
-            .WithMessage(Resources.ResourceKey.IdInvalid);
-        RuleFor(x => x.application)
-            .NotNull().NotEmpty().GreaterThan(0)
-            .WithMessage(Resources.ResourceKey.IdInvalid);
-        RuleFor(x => x.service)
-            .NotNull().NotEmpty().GreaterThan(0)
-            .WithMessage(Resources.ResourceKey.IdInvalid);
+        RuleFor(x => x.ID).ApplicationServiceId();
+        RuleFor(x => x.ApplicationID).ApplicationId();
+        RuleFor(x => x.ServiceID).ServiceId();
     }
 }

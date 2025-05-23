@@ -1,9 +1,7 @@
-using Applications.API.Api;
-using Applications.API.Common;
-using Applications.API.Util;
 using Applications.Infrastructure;
 using Asp.Versioning;
 using Asp.Versioning.Builder;
+using Common.API;
 
 var versions = new Dictionary<string, string>() { { "v1", "Application" } };
 var builder = WebApplication.CreateBuilder(args);
@@ -15,7 +13,7 @@ var builder = WebApplication.CreateBuilder(args);
 var app = builder.Build();
 {
     app.UseCommonAPI(versions, app.Environment.IsDevelopment());
-    app.UseCheckRequiredHeaderParameter(ApiResources.ApiBasePath);
+    app.UseCheckRequiredHeaderParameter();
     app.UseHealth();
 
     ApiVersionSet apiVersionSet = app.NewApiVersionSet()
@@ -24,12 +22,7 @@ var app = builder.Build();
         .ReportApiVersions()
         .Build();
 
-    app.UseApplicationEndpoints(apiVersionSet);
-    app.UseServiceEndpoints(apiVersionSet);
-    app.UseApplicationServiceEndpoints(apiVersionSet);
-    //invoice
-
+    app.RegisterAllEndpoints(apiVersionSet);
     app.Services.EnsurePersistAndMigrate();
-
     app.Run();
 }

@@ -1,16 +1,14 @@
-﻿using Applications.Usecase.Common.Interfaces;
-using Applications.Usecase.Common.Security;
-using Applications.Usecase.Service.Interfaces;
-using ErrorOr;
+﻿using Applications.Usecase.Application;
+using Applications.Usecase.Service;
 using FluentValidation;
 
 namespace Applications.Usecase.ApplicationServices.Commands;
 
 [Authorize(Permissions = Application.Permissions.Application.Update, Policies = Policy.Admin, Roles = Roles.Admin)]
 public record AddApplicationServiceCommand(
-    int application,
-    int service,
-    bool active) : IAuthorizeableRequest<ErrorOr<int>>
+    int ApplicationID,
+    int ServiceID,
+    bool Active) : IAuthorizeableRequest<ErrorOr<int>>
 {
 }
 
@@ -18,14 +16,9 @@ public class AddApplicationServiceCommandValidator
     : AbstractValidator<AddApplicationServiceCommand>
 {
     public AddApplicationServiceCommandValidator(
-        IServiceRepository serviceRepository,
         IDateTimeProvider dateTimeProvider)
     {
-        RuleFor(x => x.application)
-            .NotNull().NotEmpty().GreaterThan(0)
-            .WithMessage(Resources.ResourceKey.IdInvalid);
-        RuleFor(x => x.service)
-            .NotNull().NotEmpty().GreaterThan(0)
-            .WithMessage(Resources.ResourceKey.IdInvalid);
+        RuleFor(x => x.ApplicationID).ApplicationId();
+        RuleFor(x => x.ServiceID).ServiceId();
     }
 }

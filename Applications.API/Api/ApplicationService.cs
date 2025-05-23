@@ -1,18 +1,18 @@
-﻿using Applications.API.Common;
-using Applications.API.Util;
+﻿using Applications.API.Util;
 using Applications.Usecase.ApplicationServices.Commands;
 using Applications.Usecase.ApplicationServices.Queries;
-using Applications.Usecase.Common.Models;
 using Asp.Versioning.Builder;
+using Common.API;
+using Common.Usecase.Models;
 using ErrorOr;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Applications.API.Api;
 
-public static class ApplicationService
+public class ApplicationService: IEndpoint
 {
-    public static void UseApplicationServiceEndpoints(this IEndpointRouteBuilder app, ApiVersionSet apiVersionSet)
+    public void RegisterEndpoints(IEndpointRouteBuilder app, ApiVersionSet apiVersionSet)
     {
         RouteGroupBuilder appActions = app
         .MapGroup($"{ApiResources.ApiBasePath}/v{{version:apiVersion}}/{ApiResources.ApplicationServices}")
@@ -23,10 +23,11 @@ public static class ApplicationService
         appActions.MapPut("/{id:int}", ApplicationServiceUpdate);
         appActions.MapPost("/", ApplicationServiceAdd);
         appActions.MapPost("/getlist/{page:int}/{size:int}", ApplicationServiceReport);
+        appActions.MapGet("/getall", ApplicationServiceGetAll);
         appActions.MapDelete("/{id:int}", ApplicationServiceDelete);
     }
 
-    public static async Task<IResult> ApplicationServiceReport(
+    private async Task<IResult> ApplicationServiceReport(
         [FromBody] ReportFilterDTO? filter,
         [FromRoute] int page,
         [FromRoute] int size,
@@ -37,21 +38,29 @@ public static class ApplicationService
         var result = await mediator.Send(new ReportApplicationServiceQuery(filter, page, size), token);
         return responseHelper.OkResult(result, ToDto);
     }
-    public static async Task<IResult> ApplicationServiceAdd(
-      [FromBody] ApplicationServiceInputDTO app,
-      CancellationToken token,
-      IEndpointLinkGenerator linkGenerator,
-      HttpContext context,
-      IMediator mediator,
-      IResponseHelper responseHelper)
+    private async Task<IResult> ApplicationServiceGetAll(
+        CancellationToken token,
+        IMediator mediator,
+        IResponseHelper responseHelper)
+    {
+        var result = await mediator.Send(new GetAllApplicationServiceQuery(), token);
+        return responseHelper.OkResult(result, ToDto);
+    }
+    private async Task<IResult> ApplicationServiceAdd(
+          [FromBody] ApplicationServiceInputDTO app,
+          CancellationToken token,
+          IEndpointLinkGenerator linkGenerator,
+          HttpContext context,
+          IMediator mediator,
+          IResponseHelper responseHelper)
     {
         ErrorOr<int> result = await mediator.Send(new AddApplicationServiceCommand(
            app.ApplicationID, app.ServiceID, app.Active), token);
 
-        var location = linkGenerator.Url(context, RouteNames.ApplicationServiceGet, new { id = result.Value });
+        var location = linkGenerator.PathByName(context, RouteNames.ApplicationServiceGet.ToString(), new { id = result.Value });
         return responseHelper.CreatedResult(result, () => { return result.Value; }, location);
     }
-    public static async Task<IResult> ApplicationServiceUpdate(
+    private async Task<IResult> ApplicationServiceUpdate(
         [FromBody] ApplicationServiceInputDTO app,
         [FromRoute] int id,
         CancellationToken token,
@@ -63,10 +72,10 @@ public static class ApplicationService
         ErrorOr<int> result = await mediator.Send(new UpdateApplicationServiceCommand(
              id, app.ApplicationID, app.ServiceID, app.Active), token);
 
-        var location = linkGenerator.Url(context, RouteNames.ApplicationServiceGet, new { id = result.Value });
+        var location = linkGenerator.PathByName(context, RouteNames.ApplicationServiceGet.ToString(), new { id = result.Value });
         return responseHelper.CreatedResult(result, () => { return result.Value; }, location);
     }
-    public static async Task<IResult> ApplicationServiceDelete(
+    private async Task<IResult> ApplicationServiceDelete(
         [FromRoute] int id,
         CancellationToken token,
         IEndpointLinkGenerator linkGenerator,
@@ -75,10 +84,10 @@ public static class ApplicationService
         IResponseHelper responseHelper)
     {
         var result = await mediator.Send(new DeleteApplicationServiceCommand(id), token);
-        var location = linkGenerator.Url(context, RouteNames.ApplicationServiceDeletedGet, new { id = result.Value });
+        var location = linkGenerator.PathByName(context, RouteNames.ApplicationServiceDeletedGet.ToString(), new { id = result.Value });
         return responseHelper.CreatedResult(result, () => { return result.Value; }, location);
     }
-    private static ApplicationServiceParamDTO ToDto(Domain.Application.ApplicationService service) =>
+    private static ApplicationServiceParamDTO ToDto(Common.Domain.Entities.ApplicationService service) =>
         new(service.ID, service.ApplicationID, service.ServiceID)
         {
             Active = service.Active,
@@ -88,7 +97,9 @@ public static class ApplicationService
             Updated_At = service.Updated_At,
             Updated_By = service.Updated_By,
         };
-    private static PaginatedListDTO<ApplicationServiceParamDTO> ToDto(PaginatedListDTO<Domain.Application.ApplicationService> app) =>
+    private static List<ApplicationServiceParamDTO> ToDto(List<Common.Domain.Entities.ApplicationService> service) =>
+        service.ConvertAll(ToDto);
+    private static PaginatedListDTO<ApplicationServiceParamDTO> ToDto(PaginatedListDTO<Common.Domain.Entities.ApplicationService> app) =>
         new PaginatedListDTO<ApplicationServiceParamDTO>(app.Items.ConvertAll(ToDto), app.TotalCount, app.PageNumber, app.Items.Count);
 }
 
