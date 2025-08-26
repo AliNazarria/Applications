@@ -13,6 +13,6 @@ public class DeleteApplicationCommandValidator :
 {
     public DeleteApplicationCommandValidator()
     {
-        RuleFor(x => x.ID).ServiceId();
+        RuleFor(x => x.ID).ServiceID();
     }
 }

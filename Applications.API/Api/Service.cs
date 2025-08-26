@@ -1,9 +1,9 @@
-﻿using Applications.API.Util;
-using Applications.Usecase.Service.Commands;
+﻿using Applications.Usecase.Service.Commands;
+using Applications.Usecase.Service.Dto;
 using Applications.Usecase.Service.Queries;
 using Asp.Versioning.Builder;
 using Common.API;
-using Common.Usecase.Models;
+using Common.Usecase.Dto;
 using ErrorOr;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -35,7 +35,7 @@ public class Service : IEndpoint
         IResponseHelper responseHelper)
     {
         var result = await mediator.Send(new GetServiceQuery(id), token);
-        return responseHelper.OkResult(result, ToDto);
+        return responseHelper.OkResult(result);
     }
     private async Task<IResult> ServiceReport(
         [FromBody] ReportFilterDTO? filter,
@@ -46,7 +46,7 @@ public class Service : IEndpoint
         IResponseHelper responseHelper)
     {
         var result = await mediator.Send(new ReportServiceQuery(filter, page, size), token);
-        return responseHelper.OkResult(result, ToDto);
+        return responseHelper.OkResult(result);
     }
     private async Task<IResult> ServiceGetAll(
         CancellationToken token,
@@ -54,7 +54,7 @@ public class Service : IEndpoint
         IResponseHelper responseHelper)
     {
         var result = await mediator.Send(new GetAllServiceQuery(), token);
-        return responseHelper.OkResult(result, ToDto);
+        return responseHelper.OkResult(result);
     }
 
     private async Task<IResult> ServiceAdd(
@@ -65,10 +65,9 @@ public class Service : IEndpoint
         IMediator mediator,
         IResponseHelper responseHelper)
     {
-        ErrorOr<int> result = await mediator.Send(new AddServiceCommand(
-              service.Key, service.Name, service.Active), token);
+        ErrorOr<int> result = await mediator.Send(new AddServiceCommand(service), token);
         var location = linkGenerator.PathByName(context, RouteNames.ServiceGet.ToString(), new { id = result.Value });
-        return responseHelper.CreatedResult(result, () => { return result.Value; }, location);
+        return responseHelper.CreatedResult(result, location);
     }
     private async Task<IResult> ServiceUpdate(
         [FromBody] ServiceInputDTO service,
@@ -79,10 +78,9 @@ public class Service : IEndpoint
         IMediator mediator,
         IResponseHelper responseHelper)
     {
-        ErrorOr<int> result = await mediator.Send(new UpdateServiceCommand(
-             id, service.Key, service.Name, service.Active), token);
+        ErrorOr<int> result = await mediator.Send(new UpdateServiceCommand(id, service), token);
         var location = linkGenerator.PathByName(context, RouteNames.ServiceGet.ToString(), new { id = result.Value });
-        return responseHelper.CreatedResult(result, () => { return result.Value; }, location);
+        return responseHelper.CreatedResult(result, location);
     }
     private async Task<IResult> ServiceDelete(
         [FromRoute] int id,
@@ -94,30 +92,6 @@ public class Service : IEndpoint
     {
         var result = await mediator.Send(new DeleteServiceCommand(id), token);
         var location = linkGenerator.PathByName(context, RouteNames.ServiceDeletedGet.ToString(), new { id = result.Value });
-        return responseHelper.CreatedResult(result, () => { return result.Value; }, location);
+        return responseHelper.CreatedResult(result, location);
     }
-    private static ServiceParamDTO ToDto(Domain.Service.Service service) =>
-        new(service.ID, service.Key.Value, service.Name.Value)
-        {
-            Active = service.Active,
-            Deleted = service.Deleted,
-            Created_At = service.Created_At,
-            Created_By = service.Created_By,
-            Updated_At = service.Updated_At,
-            Updated_By = service.Updated_By,
-        };
-    private static List<ServiceParamDTO> ToDto(List<Domain.Service.Service> service) =>
-        service.ConvertAll(ToDto);
-    private static PaginatedListDTO<ServiceParamDTO> ToDto(PaginatedListDTO<Domain.Service.Service> service) =>
-        new PaginatedListDTO<ServiceParamDTO>(service.Items.ConvertAll(ToDto), service.TotalCount, service.PageNumber, service.Items.Count);
 }
-
-public record ServiceInputDTO(
-    string Key,
-    string Name)
-    : BaseInputDTO();
-public record ServiceParamDTO(
-    int ID,
-    string Key,
-    string Name
-) : BaseParamDTO();

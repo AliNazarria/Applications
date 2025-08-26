@@ -1,11 +1,11 @@
-﻿using FluentValidation;
-
+﻿using Applications.Usecase.Service.Dto;
+using FluentValidation;
 
 namespace Applications.Usecase.Service.Queries;
 
 [Authorize(Permissions = Permissions.Service.Get, Policies = Policy.Guest, Roles = "")]
 public record GetServiceQuery(int ID)
-    : IAuthorizeableRequest<ErrorOr<serviceDomain.Service>>
+    : IAuthorizeableRequest<ErrorOr<ServiceDTO>>
 {
 }
 
@@ -14,6 +14,6 @@ public class GetServiceQueryValidator
 {
     public GetServiceQueryValidator()
     {
-        RuleFor(x => x.ID).ServiceId();
+        RuleFor(x => x.ID).ServiceID();
     }
 }

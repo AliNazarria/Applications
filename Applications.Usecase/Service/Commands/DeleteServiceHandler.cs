@@ -1,23 +1,26 @@
-﻿namespace Applications.Usecase.Service.Commands;
+﻿using Applications.Usecase.Service.Specifications;
+
+namespace Applications.Usecase.Service.Commands;
 
 public class DeleteServiceHandler(
-    [FromKeyedServices(Constants.Proxy)] IGenericRepository<serviceDomain.Service, int> repository,
-    IDateTimeProvider dateTimeProvider,
-    IUserContextProvider userContext)
-    : IRequestHandler<DeleteServiceCommand, ErrorOr<int>>
+    IGenericRepository<serviceDomain.Service, int> repository
+    ) : IRequestHandler<DeleteServiceCommand, ErrorOr<int>>
 {
     public async Task<ErrorOr<int>> Handle(DeleteServiceCommand request
         , CancellationToken cancellationToken)
     {
-        var service = await repository.GetAsync(request.ID);
+        var getSpec = new GetServiceSpecification(request.ID);
+        var service = await repository.GetAsync(getSpec, cancellationToken);
         if (service is null)
             return ServiceErrors.ServiceNotFound();
 
-        service.Delete(userContext.UserID, dateTimeProvider.NowTimeStampInSecound());
+        var delResult = service.Delete();
+        if (delResult.IsError)
+            return delResult.Errors;
 
         var result = await repository.UpdateAsync(service);
-        if (result > 0)
-            return result;
+        if (result)
+            return service.ID;
 
         return ServiceErrors.ServiceDeletedFailed();
     }

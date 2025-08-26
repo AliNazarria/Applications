@@ -11,4 +11,12 @@ public static class ApplicationErrors
     public static Error ApplicationSetFailed(string desc = "") => Error.Validation(
         code: Resources.ApplicationSetFailed,
         description: desc);
+
+    public static Error ApplicationServiceSetFailed(string desc = "") => Error.Validation(
+        code: Resources.ApplicationServiceSetFailed,
+        description: desc);
+
+    public static Error ApplicationServiceDeleteFailed(string desc = "") => Error.Validation(
+        code: Resources.ApplicationServiceDeleteFailed,
+        description: desc);
 }

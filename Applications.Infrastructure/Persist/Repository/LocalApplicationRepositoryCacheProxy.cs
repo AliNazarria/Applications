@@ -1,4 +1,6 @@
-﻿using Common.Usecase.Interfaces;
+﻿using Common.Infrastructure;
+using Common.Usecase.Dto;
+using Common.Usecase.Interfaces;
 using ErrorOr;
 using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,11 +12,11 @@ public class LocalApplicationRepositoryCacheProxy(
     HybridCache hybridCache
     ) : IApplicationRepository
 {
-    public async Task<ErrorOr<List<Common.Domain.Entities.Application>>> ApplicationGetlistAsync()
+    public async Task<ErrorOr<List<ApplicationDTO>>> ApplicationGetlistAsync()
     {
         CancellationToken token = default;
         var key = "applications";
-        var tags = new List<string> { key };
+        var tags = new List<string> { CacheConstants.ApplicationsTag };
         return await hybridCache.GetOrCreateAsync(
             key,
             async get =>
@@ -31,8 +33,8 @@ public class LocalApplicationRepositoryCacheProxy(
     {
         CancellationToken token = default;
         var key = $"application-{applicationId}";
-        var tags = new List<string> { key };
-        return await hybridCache.GetOrCreateAsync(
+        var tags = new List<string> { CacheConstants.ApplicationExistTag };
+        var result = await hybridCache.GetOrCreateAsync(
              key,
              async get =>
              {
@@ -41,5 +43,6 @@ public class LocalApplicationRepositoryCacheProxy(
              },
              tags: tags,
              cancellationToken: token);
+        return result;
     }
 }

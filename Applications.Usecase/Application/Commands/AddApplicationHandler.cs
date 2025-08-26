@@ -1,23 +1,22 @@
-﻿namespace Applications.Usecase.Application.Commands;
+﻿
+namespace Applications.Usecase.Application.Commands;
 
 public class AddApplicationHandler(
-    [FromKeyedServices(Constants.Proxy)] IGenericRepository<appDomain.Application, int> repository,
-    IUserContextProvider userContext,
-    IDateTimeProvider dateTimeProvider)
-    : IRequestHandler<AddApplicationCommand, ErrorOr<int>>
+    IGenericRepository<appDomain.Application, int> repository
+    ) : IRequestHandler<AddApplicationCommand, ErrorOr<int>>
 {
-    async Task<ErrorOr<int>> IRequestHandler<AddApplicationCommand, ErrorOr<int>>.Handle(
-        AddApplicationCommand request, CancellationToken cancellationToken)
+    public async Task<ErrorOr<int>> Handle(AddApplicationCommand request, CancellationToken cancellationToken)
     {
-        var app = new appDomain.Application(
-            request.Key,
-            request.Title,
-            request.Active,
-            userContext.UserID,
-            dateTimeProvider.NowTimeStampInSecound(),
-            request.Comment,
-            request.LogoAddress);
-        var result = await repository.InsertAsync(app);
+        var newApplicationResult = appDomain.Application.CreateInstance(
+            request.Application.Key,
+            request.Application.Title,
+            request.Application.Active,
+            request.Application.Description,
+            request.Application.LogoAddress);
+        if (newApplicationResult.IsError)
+            return newApplicationResult.Errors;
+
+        var result = await repository.InsertAsync(newApplicationResult.Value);
         if (result is null)
             return ApplicationErrors.ApplicationSetFailed();
 

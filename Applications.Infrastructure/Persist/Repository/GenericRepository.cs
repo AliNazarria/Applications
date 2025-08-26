@@ -1,10 +1,9 @@
 ﻿using Common.Domain;
+using Common.Infrastructure;
+using Common.Usecase.Dto;
 using Common.Usecase.Interfaces;
-using Common.Usecase.Models;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel;
-using System.Linq.Expressions;
-using Common.Infrastructure;
 
 namespace Applications.Infrastructure.Persist.Repository;
 
@@ -22,35 +21,40 @@ public class GenericRepository<TEntity, TID>
         userContext = usercontext;
     }
 
-    public async Task<TEntity> GetAsync(TID id
-        , FindOptions<TEntity>? findOptions = null
-        , CancellationToken token = default)
+    public async Task<PaginatedListDTO<TEntity>> ReportAsync(ISpecification<TEntity> spec,
+        CancellationToken cancellationToken = default)
     {
-        return await Get(findOptions).FindAsync(id);
-    }
-    public async Task<PaginatedListDTO<TEntity>> GetPagedAsync(Expression<Func<TEntity, bool>> predicate
-        , string orderBy
-        , int page
-        , int size
-        , FindOptions<TEntity>? findOptions = null
-        , CancellationToken token = default)
-    {
-        ArgumentNullException.ThrowIfNull(predicate);
-        size = size < 1 ? 1 : size;
-        page = page < 1 ? 1 : page;
+        var query = SpecificationEvaluator<TEntity>.GetQuery(dbContext.Set<TEntity>().AsQueryable(), spec);
+        var items = await query.ToListAsync(cancellationToken);
 
-        var orderedQuery = Get(findOptions).Where(predicate).OrderBy(orderBy);
-        var items = await orderedQuery.Skip((page - 1) * size).Take(size).ToListAsync();
-        var count = await orderedQuery.CountAsync();
-        return new PaginatedListDTO<TEntity>(items, count, page, size);
-    }
-    public async Task<List<TEntity>> GetAllAsync(
-        FindOptions<TEntity>? findOptions = null
-        , CancellationToken token = default)
-    {
-        return await Get(findOptions).ToListAsync();
-    }
+        var countQuery = SpecificationEvaluator<TEntity>.GetQuery(dbContext.Set<TEntity>().AsQueryable(), spec,
+            ignorePaging: true);
+        var count = await countQuery.CountAsync();
 
+        return new PaginatedListDTO<TEntity>(items, count, spec.Page, spec.Size);
+    }
+    public async Task<TEntity> GetAsync(ISpecification<TEntity> spec,
+        CancellationToken cancellationToken = default)
+    {
+        var query = SpecificationEvaluator<TEntity>.GetQuery(dbContext.Set<TEntity>().AsQueryable(), spec);
+        return await query.FirstOrDefaultAsync(cancellationToken);
+    }
+    public async Task<TEntity> SingleGetAsync(ISpecification<TEntity> spec,
+        CancellationToken token = default)
+    {
+        var query = SpecificationEvaluator<TEntity>.GetQuery(dbContext.Set<TEntity>().AsQueryable(), spec);
+        return await query.SingleOrDefaultAsync(token);
+    }
+    public async Task<int> CountAsync(ISpecification<TEntity> spec,
+        CancellationToken token = default)
+    {
+        return await dbContext.Set<TEntity>().CountAsync(spec.Criteria);
+    }
+    public async Task<bool> ExistsAsync(ISpecification<TEntity> spec,
+        CancellationToken token = default)
+    {
+        return await dbContext.Set<TEntity>().CountAsync(spec.Criteria) != 0;
+    }
     public async Task<IEnumerable<string>> NavigationsAsync(CancellationToken token = default)
     {
         var entityNavigations = new List<string>();
@@ -59,26 +63,6 @@ public class GenericRepository<TEntity, TID>
 
         return entityNavigations;
     }
-    public async Task<int> CountAsync(Expression<Func<TEntity, bool>> predicate
-        , CancellationToken token = default)
-    {
-        ArgumentNullException.ThrowIfNull(predicate);
-        return await dbContext.Set<TEntity>().CountAsync(predicate);
-    }
-    public async Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> predicate
-        , CancellationToken token = default)
-    {
-        ArgumentNullException.ThrowIfNull(predicate);
-        return await dbContext.Set<TEntity>().CountAsync(predicate) != 0;
-    }
-    public async Task<TEntity> FirstAsync(Expression<Func<TEntity, bool>> predicate
-        , FindOptions<TEntity>? findOptions = null
-        , CancellationToken token = default)
-    {
-        ArgumentNullException.ThrowIfNull(predicate);
-        return await Get(findOptions).FirstOrDefaultAsync(predicate);
-    }
-
     public async Task<TEntity> InsertAsync(TEntity entity)
     {
         dbContext.Set<TEntity>().Add(entity);
@@ -91,12 +75,12 @@ public class GenericRepository<TEntity, TID>
         var result = await dbContext.SaveChangesAsync();
         return result > 0;
     }
-    public async Task<TID> UpdateAsync(TEntity entity)
+    public async Task<bool> UpdateAsync(TEntity entity)
     {
         dbContext.Set<TEntity>().Attach(entity);
         dbContext.Entry(entity).State = EntityState.Modified;
         var result = await dbContext.SaveChangesAsync();
-        return entity.ID;
+        return result > 0;
     }
     public async Task<bool> UpdateBatchAsync(IEnumerable<TEntity> entities)
     {
@@ -117,7 +101,7 @@ public class GenericRepository<TEntity, TID>
         var result = await dbContext.SaveChangesAsync();
         return result > 0;
     }
-    public async Task<TID> DeleteAsync(TID id)
+    public async Task<bool> DeleteAsync(TID id)
     {
         var entity = await dbContext.Set<TEntity>().FindAsync(id);
         if (entity == null)
@@ -126,7 +110,7 @@ public class GenericRepository<TEntity, TID>
         }
         dbContext.Set<TEntity>().Remove(entity);
         var result = await dbContext.SaveChangesAsync();
-        return id;
+        return result > 0;
     }
     public async Task<bool> DeleteRangeAsync(IEnumerable<TEntity> entities)
     {
@@ -150,25 +134,5 @@ public class GenericRepository<TEntity, TID>
             }
         }
         _disposed = true;
-    }
-
-    private DbSet<TEntity> Get(FindOptions<TEntity>? findOptions = null)
-    {
-        findOptions ??= new FindOptions<TEntity>();
-        var entity = dbContext.Set<TEntity>();
-        if (findOptions.IsIgnoreAutoIncludes)
-        {
-            entity.IgnoreAutoIncludes();
-        }
-        if (findOptions.IsAsNoTracking)
-        {
-            entity.AsNoTracking();
-        }
-
-        foreach (var include in findOptions.Includes)
-        {
-            entity.Include(include).Load();
-        }
-        return entity;
     }
 }

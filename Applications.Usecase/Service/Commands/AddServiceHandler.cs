@@ -1,21 +1,19 @@
 ﻿namespace Applications.Usecase.Service.Commands;
 
 public class AddServiceHandler(
-    [FromKeyedServices(Constants.Proxy)] IGenericRepository<serviceDomain.Service, int> repository,
-    IUserContextProvider userContext,
-    IDateTimeProvider dateTimeProvider)
-    : IRequestHandler<AddServiceCommand, ErrorOr<int>>
+    IGenericRepository<serviceDomain.Service, int> repository
+    ) : IRequestHandler<AddServiceCommand, ErrorOr<int>>
 {
-    async Task<ErrorOr<int>> IRequestHandler<AddServiceCommand, ErrorOr<int>>.Handle(
-        AddServiceCommand request, CancellationToken cancellationToken)
+    public async Task<ErrorOr<int>> Handle(AddServiceCommand request, CancellationToken cancellationToken)
     {
-        var service = new serviceDomain.Service(
-            request.Key,
-            request.Name,
-            request.Active,
-            userContext.UserID,
-            dateTimeProvider.NowTimeStampInSecound());
-        var result = await repository.InsertAsync(service);
+        var newServiceResult = serviceDomain.Service.CreateInstance(
+            request.Service.Key,
+            request.Service.Name,
+            request.Service.Active);
+        if (newServiceResult.IsError)
+            return newServiceResult.Errors;
+
+        var result = await repository.InsertAsync(newServiceResult.Value);
         if (result is null)
             return ServiceErrors.ServiceSetFailed();
 

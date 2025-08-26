@@ -1,13 +1,14 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Applications.Domain.Application;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Applications.Infrastructure.Persist.Config;
 
-public class ApplicationConfig : IEntityTypeConfiguration<Common.Domain.Entities.Application>
+public class ApplicationConfig : IEntityTypeConfiguration<Application>
 {
-    public void Configure(EntityTypeBuilder<Common.Domain.Entities.Application> builder)
+    public void Configure(EntityTypeBuilder<Application> builder)
     {
-        builder.ToTable($"{nameof(Common.Domain.Entities.Application)}", schema: DataSchemaConstants.DEFAULT_SCHEMA_NAME);
+        builder.ToTable($"{nameof(Application)}", schema: DataSchemaConstants.DEFAULT_SCHEMA_NAME);
         builder.Property(p => p.ID).IsRequired()
           .UseIdentityColumn().ValueGeneratedOnAdd();
 
@@ -23,15 +24,14 @@ public class ApplicationConfig : IEntityTypeConfiguration<Common.Domain.Entities
         builder.ComplexProperty(p => p.LogoAddress).Property(p => p.Value)
             .HasColumnName("LogoAddress");
 
-        builder.ComplexProperty(p => p.Comment).Property(p => p.Value)
-            .HasColumnName("Comment").HasMaxLength(DataSchemaConstants.MAX_COMMENT_LENGTH);
+        builder.ComplexProperty(p => p.Description).Property(p => p.Value)
+            .HasColumnName("Description").HasMaxLength(DataSchemaConstants.MAX_COMMENT_LENGTH);
 
         builder.ComplexProperty(p => p.Title).Property(p => p.Value)
             .HasColumnName("Title").HasMaxLength(DataSchemaConstants.MAX_TITLE_LENGTH);
 
         builder.ComplexProperty(p => p.Key).Property(p => p.Value)
             .HasColumnName("Key").HasMaxLength(DataSchemaConstants.MAX_TITLE_LENGTH);
-
 
         builder.Navigation(x => x.Services);
         builder

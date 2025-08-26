@@ -1,16 +1,11 @@
-﻿using FluentValidation;
+﻿using Applications.Usecase.Application.Dto;
+using FluentValidation;
 
 namespace Applications.Usecase.Application.Commands;
 
 [Authorize(Permissions = Permissions.Application.Update, Policies = Policy.Admin, Roles = Roles.Admin)]
-public record UpdateApplicationCommand(
-    int ID,
-    string Key,
-    string Title,
-    string Comment,
-    string LogoAddress,
-    bool Active
-    ) : IAuthorizeableRequest<ErrorOr<int>>
+public record UpdateApplicationCommand(int ID, ApplicationInputDTO Application)
+    : IAuthorizeableRequest<ErrorOr<int>>
 {
 }
 
@@ -19,7 +14,8 @@ public class UpdateApplicationCommandValidator
 {
     public UpdateApplicationCommandValidator()
     {
-        RuleFor(x => x.ID).ApplicationId();
-        RuleFor(x => x.Title).Title();
+        RuleFor(x => x.ID).ApplicationID();
+        RuleFor(x => x.Application).NotNull()
+            .SetValidator(new ApplicationValidator());
     }
 }

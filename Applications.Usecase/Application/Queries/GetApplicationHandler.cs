@@ -1,18 +1,21 @@
-﻿namespace Applications.Usecase.Application.Queries;
+﻿using Applications.Usecase.Application.Interfaces;
+using Applications.Usecase.Application.Specifications;
+
+namespace Applications.Usecase.Application.Queries;
 
 public class GetApplicationHandler(
-    [FromKeyedServices(Constants.Proxy)] IGenericRepository<appDomain.Application, int> repository
-    )
-    : IRequestHandler<GetApplicationQuery, ErrorOr<appDomain.Application>>
+    IGenericRepository<appDomain.Application, int> repository,
+    IApplicationMapper mapper)
+    : IRequestHandler<GetApplicationQuery, ErrorOr<ApplicationDTO>>
 {
-    async Task<ErrorOr<appDomain.Application>> IRequestHandler<GetApplicationQuery, ErrorOr<appDomain.Application>>.Handle(
+    async Task<ErrorOr<ApplicationDTO>> IRequestHandler<GetApplicationQuery, ErrorOr<ApplicationDTO>>.Handle(
         GetApplicationQuery request, CancellationToken cancellationToken)
     {
-        var option = FindOptions<appDomain.Application>.ReportOptions();
-        var result = await repository.GetAsync(request.ID, findOptions: option, token: cancellationToken);
+        var getSpec = new GetApplicationSpecification(request.ID);
+        var result = await repository.SingleGetAsync(getSpec, cancellationToken);
         if (result is null)
             return ApplicationErrors.ApplicationNotFound();
 
-        return result;
+        return mapper.ToDto(result);
     }
 }

@@ -1,10 +1,11 @@
-﻿using FluentValidation;
+﻿using Applications.Usecase.Application.Dto;
+using FluentValidation;
 
 namespace Applications.Usecase.Application.Queries;
 
 [Authorize(Permissions = Permissions.Application.Get, Policies = Policy.Guest, Roles = "")]
 public record GetApplicationQuery(int ID)
-    : IAuthorizeableRequest<ErrorOr<appDomain.Application>>
+    : IAuthorizeableRequest<ErrorOr<ApplicationDTO>>
 {
 }
 
@@ -13,6 +14,6 @@ public class GetApplicationQueryValidator
 {
     public GetApplicationQueryValidator()
     {
-        RuleFor(x => x.ID).ApplicationId();
+        RuleFor(x => x.ID).ApplicationID();
     }
 }

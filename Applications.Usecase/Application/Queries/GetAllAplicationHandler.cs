@@ -1,12 +1,11 @@
 ﻿namespace Applications.Usecase.Application.Queries;
 
 public class GetAllAplicationHandler(
-    [FromKeyedServices(Constants.Proxy)] IGenericRepository<appDomain.Application, int> repository
-    ) : IRequestHandler<GetAllAplicationQuery, ErrorOr<List<appDomain.Application>>>
+    [FromKeyedServices(Common.Usecase.Constants.Cached)] IApplicationRepository repository
+    ) : IRequestHandler<GetAllAplicationQuery, ErrorOr<List<ApplicationDTO>>>
 {
-    public async Task<ErrorOr<List<appDomain.Application>>> Handle(GetAllAplicationQuery request, CancellationToken cancellationToken)
+    public async Task<ErrorOr<List<ApplicationDTO>>> Handle(GetAllAplicationQuery request, CancellationToken cancellationToken)
     {
-        var options = FindOptions<appDomain.Application>.ReportOptions();
-        return await repository.GetAllAsync(options, cancellationToken);
+        return await repository.ApplicationGetlistAsync();
     }
 }

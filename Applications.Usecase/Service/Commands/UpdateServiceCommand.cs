@@ -1,13 +1,11 @@
-﻿using FluentValidation;
+﻿using Applications.Usecase.Service.Dto;
+using FluentValidation;
 
 namespace Applications.Usecase.Service.Commands;
 
 [Authorize(Permissions = Permissions.Service.Set, Policies = Policy.Admin, Roles = Roles.Admin)]
-public record UpdateServiceCommand(
-    int ID,
-    string Key,
-    string Name,
-    bool Active) : IAuthorizeableRequest<ErrorOr<int>>
+public record UpdateServiceCommand(int ID, ServiceInputDTO Service)
+    : IAuthorizeableRequest<ErrorOr<int>>
 {
 }
 
@@ -16,7 +14,7 @@ public class UpdateServiceCommandValidator
 {
     public UpdateServiceCommandValidator()
     {
-        RuleFor(x => x.ID).ServiceId();
-        RuleFor(x => x.Name).ServiceName();
+        RuleFor(x => x.ID).ServiceID();
+        RuleFor(x => x.Service).NotNull().SetValidator(new ServiceValidation());
     }
 }

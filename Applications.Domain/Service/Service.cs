@@ -13,39 +13,42 @@ public class Service : Entity<int>
     public KeyValueObject Key { get; private set; }
     public NameValueObject Name { get; private set; }
 
-    private Service() { }
-    public Service(string key,
+    public static ErrorOr<Service> CreateInstance(string key,
         string name,
-        bool active,
-        Guid userId,
-        int createDate)
+        bool active)
+    {
+        var newService = new Service(key, name, active);
+        return newService;
+    }
+
+    private Service() { }
+    private Service(string key,
+        string name,
+        bool active)
     {
         this.Key = new KeyValueObject(key);
         this.Name = new NameValueObject(name);
         if (active)
             this.Activated();
-        this.Create(createDate, userId);
         RegisterDomainEvent(new ServiceAddEvent(this));
     }
 
     public ErrorOr<Success> Update(string key,
         string name,
-        bool active,
-        Guid userId,
-        int updateDate)
+        bool active)
     {
         this.Key = new KeyValueObject(key);
         this.Name = new NameValueObject(name);
         if (!active)
             this.Deactive();
-        this.Update(updateDate, userId);
+        this.UpdateProperties();
         RegisterDomainEvent(new ServiceUpdateEvent(this));
         return Result.Success;
     }
-    public ErrorOr<Success> Delete(Guid user, int deleteDate)
+    public ErrorOr<Success> Delete()
     {
         this.SoftDelete();
-        this.Update(deleteDate, user);
+        this.UpdateProperties();
         RegisterDomainEvent(new ServiceDeleteEvent(this));
         return Result.Success;
     }

@@ -1,26 +1,29 @@
-﻿using Common.Usecase.Interfaces;
+﻿using Applications.Usecase.Application.Interfaces;
+using Common.Usecase.Dto;
+using Common.Usecase.Interfaces;
 using ErrorOr;
 using Microsoft.EntityFrameworkCore;
 
 namespace Applications.Infrastructure.Persist.Repository;
 
 public class LocalApplicationRepository(
-    AppDbContext dbContext
+    AppDbContext dbContext,
+    IApplicationMapper mapper
     ) : IApplicationRepository
 {
-    public async Task<ErrorOr<List<Common.Domain.Entities.Application>>> ApplicationGetlistAsync()
+    public async Task<ErrorOr<List<ApplicationDTO>>> ApplicationGetlistAsync()
     {
-        return await dbContext.Applications
+        var report = await dbContext.Applications
             .AsNoTrackingWithIdentityResolution()
-            .Where(x => x.Active == true && x.Deleted == false)
+            .Include(x => x.Services)
             .ToListAsync();
+
+        return mapper.ToDto(report);
     }
     public async Task<ErrorOr<bool>> IsExistAsync(int applicationId)
     {
         return await dbContext.Applications
            .AsNoTrackingWithIdentityResolution()
-           .AnyAsync(x => x.ID == applicationId
-                           && x.Active == true
-                           && x.Deleted == false);
+           .AnyAsync(x => x.ID == applicationId);
     }
 }

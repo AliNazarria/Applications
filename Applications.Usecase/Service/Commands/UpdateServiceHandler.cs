@@ -1,27 +1,27 @@
-﻿namespace Applications.Usecase.Service.Commands;
+﻿using Applications.Usecase.Service.Specifications;
+
+namespace Applications.Usecase.Service.Commands;
 
 public class UpdateServiceHandler(
-    [FromKeyedServices(Constants.Proxy)] IGenericRepository<serviceDomain.Service, int> repository,
-    IUserContextProvider userContext,
-    IDateTimeProvider dateTimeProvider)
-    : IRequestHandler<UpdateServiceCommand, ErrorOr<int>>
+    IGenericRepository<serviceDomain.Service, int> repository
+    ) : IRequestHandler<UpdateServiceCommand, ErrorOr<int>>
 {
-    async Task<ErrorOr<int>> IRequestHandler<UpdateServiceCommand, ErrorOr<int>>.Handle(
-        UpdateServiceCommand request, CancellationToken cancellationToken)
+    public async Task<ErrorOr<int>> Handle(UpdateServiceCommand request, CancellationToken cancellationToken)
     {
-        var service = await repository.GetAsync(request.ID);
+        var updateSpec = new UpdateServiceSpecification(request.ID);
+        var service = await repository.GetAsync(updateSpec);
         if (service is null)
             return ServiceErrors.ServiceNotFound();
 
-        service.Update(request.Key,
-            request.Name,
-            request.Active,
-            userContext.UserID,
-            dateTimeProvider.NowTimeStampInSecound());
+        var updateResult = service.Update(request.Service.Key,
+            request.Service.Name,
+            request.Service.Active);
+        if (updateResult.IsError)
+            return updateResult.Errors;
 
         var result = await repository.UpdateAsync(service);
-        if (result > 0)
-            return result;
+        if (result)
+            return service.ID;
 
         return ServiceErrors.ServiceSetFailed();
     }

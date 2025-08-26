@@ -12,7 +12,7 @@ public class AddTableApplication : FluentMigrator.Migration
             .WithColumn("ID").AsInt32().Identity().PrimaryKey()
             .WithColumn("Key").AsString(150).NotNullable()
             .WithColumn("Title").AsString(150).NotNullable()
-            .WithColumn("Comment").AsString(int.MaxValue).Nullable()
+            .WithColumn("Description").AsString(int.MaxValue).Nullable()
             .WithColumn("LogoAddress").AsString(int.MaxValue).Nullable()
             .WithColumn("Active").AsBoolean().NotNullable().WithDefaultValue(true)
             .WithColumn("Deleted").AsBoolean().NotNullable().WithDefaultValue(false);

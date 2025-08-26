@@ -16,6 +16,11 @@ public static class Injection
 {
     public static IServiceCollection RegisterInfrastructure(this IServiceCollection services, IConfiguration configuration, bool isDevelopment)
     {
+        services.AddOptions<ConnectionStringsConfigOptions>()
+            .Bind(configuration.GetSection(ConnectionStringsConfigOptions.SectionName))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
         services
             .RegisterCommonInfraServices(configuration, isDevelopment)
             .RegisterLocalApplicationRepository()
@@ -32,6 +37,9 @@ public static class Injection
                 LocalCacheExpiration = TimeSpan.FromMinutes(60)
             };
         });
+
+        services.AddScoped<IEventBus, RabbitMqEventBus>();
+
         return services;
     }
 
@@ -43,12 +51,18 @@ public static class Injection
     }
     private static IServiceCollection RegisterPersist(this IServiceCollection services, IConfiguration configuration)
     {
-        var connectionString = configuration.GetConnectionString(PersistSettings.Section);
-        services.AddDbContext<AppDbContext>(options =>
-        {
-            options.UseSqlServer(connectionString);
-        });
-        services.AddKeyedScoped(typeof(IGenericRepository<,>), Common.Usecase.Constants.Real, typeof(GenericRepository<,>));
+        services.AddScoped<IModelCacheKeyFactory, DynamicModelCacheKeyFactory>();
+
+        var option = new TypedConfiguration<ConnectionStringsConfigOptions>(configuration.GetSection(ConnectionStringsConfigOptions.SectionName));
+        services.AddStackExchangeRedisCache(options =>
+            {
+                options.Configuration = option.Value.Redis;
+            })
+            .AddDbContext<AppDbContext>(options =>
+            {
+                options.UseSqlServer(option.Value.Database);
+            }, ServiceLifetime.Scoped);
+        services.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));
 
         return services;
     }

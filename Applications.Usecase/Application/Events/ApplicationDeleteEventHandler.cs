@@ -1,14 +1,15 @@
-﻿using Common.Domain.Entities.Events;
+﻿using Applications.Domain.Application.Events;
 
 namespace Applications.Usecase.Application.Events;
 
 public class ApplicationDeleteEventHandler(
-    ILoggerServiceProvider loggerService,
-    IUserContextProvider userContext, IDateTimeProvider dateTime)
-    : INotificationHandler<ApplicationDeleteEvent>
+    IEventBus eventBus,
+    ILoggerServiceProvider loggerService
+    ): INotificationHandler<ApplicationDeleteEvent>
 {
     public async Task Handle(ApplicationDeleteEvent notification, CancellationToken cancellationToken)
     {
+        await eventBus.PublishAsync(new { });
         await loggerService.LogUserActivity();
     }
 }

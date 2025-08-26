@@ -1,24 +1,18 @@
-﻿namespace Applications.Usecase.Application.Queries;
+﻿using Applications.Usecase.Application.Interfaces;
+using Applications.Usecase.Application.Specifications;
+
+namespace Applications.Usecase.Application.Queries;
 
 public class ReportApplicationHandler(
-    [FromKeyedServices(Constants.Proxy)] IGenericRepository<appDomain.Application, int> repository
-    ) :
-    IRequestHandler<ReportApplicationQuery, ErrorOr<PaginatedListDTO<appDomain.Application>>>
+    IGenericRepository<appDomain.Application, int> repository,
+    IApplicationMapper mapper)
+    : IRequestHandler<ReportApplicationQuery, ErrorOr<PaginatedListDTO<ApplicationDTO>>>
 {
-    public async Task<ErrorOr<PaginatedListDTO<appDomain.Application>>> Handle(
+    public async Task<ErrorOr<PaginatedListDTO<ApplicationDTO>>> Handle(
         ReportApplicationQuery request, CancellationToken cancellationToken)
     {
-        var predicateResult = PredicateBuilder.MakePredicate<appDomain.Application>(request.Filter?.Filter);
-        if (predicateResult.IsError)
-            return predicateResult.Errors;
-
-        var options = FindOptions<appDomain.Application>.ReportOptions();
-        var result = await repository.GetPagedAsync(predicateResult.Value
-            , request.Filter?.OrderBy
-            , request.Page
-            , request.Size
-            , findOptions: options
-            , token: cancellationToken);
-        return result;
+        var reportSpec = new ReportApplicationSpecification(request.Page, request.Size, request.Filter);
+        var report = await repository.ReportAsync(reportSpec, cancellationToken);
+        return mapper.ToDto(report);
     }
 }

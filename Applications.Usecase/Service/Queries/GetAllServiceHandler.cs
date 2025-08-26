@@ -1,12 +1,18 @@
-﻿namespace Applications.Usecase.Service.Queries;
+﻿using Applications.Usecase.Service.Dto;
+using Applications.Usecase.Service.Interfaces;
+using Applications.Usecase.Service.Specifications;
+
+namespace Applications.Usecase.Service.Queries;
 
 public class GetAllServiceHandler(
-    [FromKeyedServices(Constants.Proxy)] IGenericRepository<serviceDomain.Service, int> repository
-    ) : IRequestHandler<GetAllServiceQuery, ErrorOr<List<serviceDomain.Service>>>
+    IGenericRepository<serviceDomain.Service, int> repository,
+    IServiceMapper mapper
+    ) : IRequestHandler<GetAllServiceQuery, ErrorOr<List<ServiceDTO>>>
 {
-    public async Task<ErrorOr<List<serviceDomain.Service>>> Handle(GetAllServiceQuery request, CancellationToken cancellationToken)
+    public async Task<ErrorOr<List<ServiceDTO>>> Handle(GetAllServiceQuery request, CancellationToken cancellationToken)
     {
-        var options = FindOptions<serviceDomain.Service>.ReportOptions();
-        return await repository.GetAllAsync(options, cancellationToken);
+        var reportSpec = new ReportServiceSpecification();
+        var report = await repository.ReportAsync(reportSpec, cancellationToken);
+        return mapper.ToDto(report.Items);
     }
 }

@@ -1,29 +1,29 @@
-﻿namespace Applications.Usecase.Application.Commands;
+﻿using Applications.Usecase.Application.Specifications;
+
+namespace Applications.Usecase.Application.Commands;
 
 public class UpdateApplicationHandler(
-    [FromKeyedServices(Constants.Proxy)] IGenericRepository<appDomain.Application, int> repository,
-    IUserContextProvider userContext,
-    IDateTimeProvider dateTimeProvider)
-    : IRequestHandler<UpdateApplicationCommand, ErrorOr<int>>
+    IGenericRepository<appDomain.Application, int> repository
+    ) : IRequestHandler<UpdateApplicationCommand, ErrorOr<int>>
 {
-    async Task<ErrorOr<int>> IRequestHandler<UpdateApplicationCommand, ErrorOr<int>>.Handle(
-        UpdateApplicationCommand request, CancellationToken cancellationToken)
+    public async Task<ErrorOr<int>> Handle(UpdateApplicationCommand request, CancellationToken cancellationToken)
     {
-        var app = await repository.GetAsync(request.ID);
+        var updateSpec = new UpdateApplicationSpecification(request.ID);
+        var app = await repository.GetAsync(updateSpec, cancellationToken);
         if (app is null)
             return ApplicationErrors.ApplicationNotFound();
 
-        app.Update(request.Key,
-            request.Title,
-            request.Active,
-            userContext.UserID,
-            dateTimeProvider.NowTimeStampInSecound(),
-            request.Comment,
-            request.LogoAddress);
+        var updateResult = app.Update(request.Application.Key,
+            request.Application.Title,
+            request.Application.Active,
+            request.Application.Description,
+            request.Application.LogoAddress);
+        if (updateResult.IsError)
+            return updateResult.Errors;
 
         var result = await repository.UpdateAsync(app);
-        if (result > 0)
-            return result;
+        if (result)
+            return app.ID;
 
         return ApplicationErrors.ApplicationSetFailed();
     }

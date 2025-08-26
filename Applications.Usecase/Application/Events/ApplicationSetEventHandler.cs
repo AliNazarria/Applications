@@ -1,15 +1,15 @@
-﻿using Common.Domain.Entities.Events;
+﻿using Applications.Domain.Application.Events;
 
 namespace Applications.Usecase.Application.Events;
 
 public class ApplicationSetEventHandler(
-    ILoggerServiceProvider loggerService,
-    IUserContextProvider userContext, 
-    IDateTimeProvider dateTime)
-    : INotificationHandler<ApplicationUpdateEvent>
+    IEventBus eventBus,
+    ILoggerServiceProvider loggerService
+    ) : INotificationHandler<ApplicationUpdateEvent>
 {
     public async Task Handle(ApplicationUpdateEvent notification, CancellationToken cancellationToken)
     {
+        await eventBus.PublishAsync(new { });
         await loggerService.LogUserActivity();
     }
 }
